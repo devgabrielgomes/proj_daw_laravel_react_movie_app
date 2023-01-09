@@ -1,0 +1,294 @@
+.wrap {
+    overflow: hidden;
+    position: relative;
+}
+
+.background {
+    opacity: 0.1;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 1)), to(rgba(0, 0, 0, 0)));
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+}
+
+.movieinfo {
+    position: relative;
+    margin-top: 3%;
+    padding-right: 10%;
+    padding-left: 10%;
+}
+
+.movie--information {
+    color: white;
+    font-family: 'Raleway', sans-serif;
+    opacity: 1;
+}
+
+
+.movie-list-button.col-sm-2 {
+    padding: 0;
+}
+
+.movie-list-button-option {
+    width: max-contents;
+    min-width: 100px;
+}
+
+#btn-add-movie {
+    font-weight: 800;
+}
+
+#button-remove-movie {
+    font-weight: 800;
+}
+
+
+.movie-title-year {
+    padding: 0%;
+}
+
+.movieinfo-poster {
+    height: auto;
+    width: 320px;
+    box-shadow: 0 0 1em rgb(0, 0, 0);
+    right: 0;
+    text-align: center;
+}
+
+.movie-details {}
+
+.movieinfo--release {
+    font-size: 1.8em;
+}
+
+.info-rating {
+    margin-top: 20px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.info-rating-img {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    padding-top: 1px;
+    display: inline;
+}
+
+.info-rating h2 {
+    display: inline;
+    font-size: 25px;
+}
+
+.movie--genres {
+    font-size: 18px;
+    font-weight: 800;
+    font-style: italic;
+    color: #6e7581;
+}
+
+
+.synopsis-title {
+    margin-top: 25px;
+    font-weight: bold;
+}
+
+.synopsis--text {
+    text-align: left;
+    line-height: 2.2;
+    font-size: 1.2em;
+}
+
+.list--button {
+    min-width: 100px;
+    text-align: right;
+}
+
+.movieinfo-extra {
+    margin-left: 5%;
+    margin-right: 5%;
+    padding-top: 30px;
+}
+
+.movieinfo-extra-row {
+    color: white;
+    font-family: 'Raleway', sans-serif;
+}
+
+.main-actors {
+    padding-top: 50px;
+}
+
+.actor-container {
+    padding-top: 30px;
+}
+
+#actor-pic {
+    margin-left: auto;
+    margin-right: auto;
+    height: 180px;
+    width: 200px;
+    min-height: 180px;
+    min-width: 200px;
+    object-fit: cover;
+    object-position: 100% 0;
+    border-radius: 50%;
+}
+
+.title-actors {
+    text-align: center;
+}
+
+.actor-name {
+    padding-top: 10px;
+    text-align: center;
+}
+
+.trailer--container {
+    padding-top: 50px;
+    text-align: center;
+    padding-bottom: 150px;
+}
+
+.trailer {
+    text-align: center;
+}
+
+.iframe-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+}
+
+.iframe-container iframe {
+    padding-top: 20px;
+    position: absolute;
+    top: 0;
+    left: 10%;
+    width: 90%;
+    height: 90%;
+}
+
+.movie--info--container {
+    height: 410px;
+}
+
+@media only screen and (max-width: 1400px) {
+    #actor-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        object-position: 100% 0;
+        border-radius: 50%;
+        margin: 0 auto;
+    }
+
+    .iframe-container iframe {
+        left: 8%;
+    }
+}
+
+@media only screen and (max-width: 1300px) {
+    .movieinfo {
+        padding-left: 3%;
+        padding-right: 3%;
+    }
+
+    .movieinfo-poster {
+        width: 270px;
+    }
+
+    #root>div>div.wrap>div.movieinfo>div>div.movieinfo-col.col-md-8>div.movie-details.row>div.synopsis.row {
+        padding: 0%;
+        margin: 0%;
+    }
+
+    #root>div>div.wrap>div.movieinfo>div>div.movieinfo-col.col-md-8>div.movie-details.row>div.synopsis.row>div {
+        padding-right: 0%;
+    }
+
+    .iframe-container iframe {
+        left: 5%;
+    }
+
+    .movieinfo-extra {
+        margin-left: 2%;
+        margin-right: 2%;
+    }
+}
+
+@media only screen and (max-width: 1050px) {
+    .movieinfo-poster {
+        width: 250px;
+    }
+}
+
+@media only screen and (max-width: 1000px) {
+    .movieinfo {
+        margin-top: 5%;
+    }
+}
+
+@media only screen and (max-width: 830px) {
+    .movieinfo-poster {
+        width: 220px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .movieinfo-col {
+        padding-top: 3%;
+    }
+
+    .movie-list-button-option {
+        margin-right: 10px;
+    }
+
+    .movieinfo-col {
+        padding-top: 20px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .movieinfo {
+        padding-right: 10%;
+        padding-left: 10%;
+    }
+
+    .synopsis-title {
+        font-size: 1.13em;
+    }
+
+    .synopsis--text {
+        font-size: 1.1em;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .movieinfo-poster {
+        width: 200px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media only screen and (max-width: 300px) {
+    .movieinfo-poster {
+        width: 150px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

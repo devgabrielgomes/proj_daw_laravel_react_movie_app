@@ -1,0 +1,48 @@
+
+
+.welcome--text {
+    padding-top: 50px;
+    padding-bottom: 10px;
+    font-family: 'Raleway', sans-serif;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.welcome--text h1 {
+    color: white;
+    text-align: center;
+}
+
+.search--bar {
+    text-align: center;
+}
+
+.searchbar {
+    margin-top: 5px;
+    border: 1px solid white;
+    border-radius: 50px;
+    background-color: #141619;
+    padding: 5px 15px;
+    color: white;
+    width: 20rem;
+    font-size: 1.2em;
+    width: 400px;
+}
+
+@media only screen and (max-width: 600px) {
+    .searchbar {
+        width: 300px;
+    }
+}
+
+.searchbar:focus {
+    outline: none;
+    border: 1px solid #0444a4;
+}
+
+.movie--container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 100%;
+}

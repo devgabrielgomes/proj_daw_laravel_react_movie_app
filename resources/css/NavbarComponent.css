@@ -1,0 +1,34 @@
+.navbar-container {
+    font-family: 'Raleway', sans-serif;
+}
+
+#navbarScroll>form>a {
+    text-decoration: none;
+    color: white;
+}
+
+.movieguru {
+    font-weight: 600;
+    display: flex;
+}
+
+.movie-letter {
+    margin: 0px;
+}
+
+.guru-letter {
+    color: #0444a4;
+    font-weight: 700;
+    padding-left: 4px;
+    margin: 0px;
+}
+
+.nav--link {
+    text-decoration: none;
+    color: white;
+    padding: 10px;
+}
+
+.nav--link:hover {
+    font-weight: 900;
+}

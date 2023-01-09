@@ -1,0 +1,63 @@
+.table-container {
+    padding: 40px;
+    width: 60%;
+    margin: auto;
+    margin-bottom: 200px;
+    font-family: 'Raleway', sans-serif;
+}
+
+.page-title {
+    color: white;
+}
+
+.number-movies {
+    color: white;
+}
+
+.add-movie-btn {
+    float: right;
+    margin-bottom: 15px;
+}
+
+.number-th {
+    width: 3%;
+    text-align: center;
+}
+
+.cover-th {
+    width: 9%;
+    text-align: center;
+}
+
+.title-th {
+    text-align: center;
+}
+
+.title {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.actions-th {
+    width: 20%;
+    text-align: center;
+}
+
+.block {
+    display:block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
+
+.button-container {
+    align-items: center;
+    justify-content: center;
+}
+
+.number {
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+}
+

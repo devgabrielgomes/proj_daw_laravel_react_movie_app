@@ -1,0 +1,20 @@
+.title-mylist {
+    color: white;
+    padding-top: 50px;
+    padding-left: 50px;
+    padding-bottom: 10px;
+    font-family: 'Raleway', sans-serif;
+    text-align: left;
+}
+
+.no-movies {
+    text-align: center;
+    color: white;
+}
+
+.movie-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 100%;
+}
