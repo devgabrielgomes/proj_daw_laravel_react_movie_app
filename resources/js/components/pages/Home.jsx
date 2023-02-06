@@ -8,7 +8,8 @@ import { motion } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const FEATURED_API = `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=3bf31c72f99e4189266c43358ac6e189&page=1`
+//const FEATURED_API = `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=3bf31c72f99e4189266c43358ac6e189&page=1`
+const FEATURED_API = `http://127.0.0.1:8000/api/v1/movies?page=1`
 const SEARCH_API = `https://api.themoviedb.org/3/search/movie?api_key=3bf31c72f99e4189266c43358ac6e189&language=en-US&page=1&include_adult=false&query=`
 
 const Home = () => {
@@ -24,8 +25,8 @@ const Home = () => {
             .then(res => res.json())
             .then(data => {
                 console.log(data)
-                if (data.results.length > 0) {
-                    setMovies(data.results)
+                if (data.data.length > 0) {
+                    setMovies(data.data)
                 } else {
                     toast.error(`The movie that you searched doesn't exists in our system!`, {
                         position: "top-right",
