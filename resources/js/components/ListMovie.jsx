@@ -6,14 +6,26 @@ import { motion } from "framer-motion";
 import star from "./images/star.png";
 import "../../css/ListMovie.css";
 
-const IMG_API = "https://image.tmdb.org/t/p/w1280"
-const REMOVE_API = `https://api.themoviedb.org/3/list/8209568/remove_item?api_key=3bf31c72f99e4189266c43358ac6e189&session_id=b574b79cc4dbcadeead287a7fa1d15a82e54c305`
-
 const ListMovie = ({ movie, removeMovie }) => {
     const [showModal, setShowModal] = useState(false)
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
     const [show, setShow] = useState(false);
+    const IMAGE_API = `http://127.0.0.1:8000/api/movie_images?id[eq]=${movie.id}`
+    const [imageData, setImageData] = useState([])
+
+    useEffect(() => {
+        getImageData(IMAGE_API)
+    }, [])
+
+    //Image Data
+    async function getImageData(IMAGE_API) {
+        await fetch(IMAGE_API)
+            .then(res => res.json())
+            .then(data => {
+                setImageData(data.data[0])
+            })
+    }
 
     return (
         <>
@@ -23,14 +35,14 @@ const ListMovie = ({ movie, removeMovie }) => {
                 >
                     <div className="movie-info-container">
                         <Link style={{ textDecoration: 'none', color: "white" }} to={`/movieinfo/${movie.id}`}>
-                            <img className="movie-poster" src={movie.poster_path ? IMG_API + movie.poster_path : "https://images.unsplash.com/photo-1616530940355-351fabd9524b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=735&q=80"} alt="poster" />
+                            <img className="movie-poster" src={`/uploads/movie_images/cover/${imageData.cover}`} alt="poster" />
                             <div className="movie-info">
                                 <h4>{movie.title ? movie.title : movie.name}</h4>
                                 <span>{2010}</span>
                             </div>
                             <div className="movie-over">
                                 <div className="movie-rating">
-                                    <h2>{movie.vote_average}</h2>
+                                    <h2>{movie.rating}</h2>
                                     <img src={star} alt="star" />
                                 </div>
                                 <button type="button" className="btn btn-outline-primary">

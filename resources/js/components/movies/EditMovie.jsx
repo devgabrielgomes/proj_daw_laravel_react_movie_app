@@ -2,15 +2,19 @@ import React, {useEffect, useState} from "react";
 import NavbarComponent from "../NavbarComponent";
 import {Button, Form, Row, Col} from "react-bootstrap";
 import "../../../css/Change.css";
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {read} from "@popperjs/core";
 import { motion } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ListMovie from "@/components/ListMovie";
 
-function Change() {
+function EditMovie() {
+    let params = useParams();
+    let id = params.id
+    const MOVIE_API = `http://127.0.0.1:8000/api/movies/${id}`
+    const [movieInfo, setMovieInfo] = useState({})
     const navigate = useNavigate()
-
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [year, setYear] = useState("");
@@ -24,6 +28,12 @@ function Change() {
     const [posterImage, setPosterImage] = useState();
     const [background, setBackground] = useState();
     const [backgroundImage, setBackgroundImage] = useState();
+
+
+    useEffect(() => {
+        getMovieData(MOVIE_API)
+
+    }, [])
 
     useEffect(() => {
             if (poster) {
@@ -48,6 +58,28 @@ function Change() {
             setBackgroundImage(null);
         }
     }, [background]);
+
+    //Movie Data
+    async function getMovieData(MOVIE_API) {
+        await fetch(MOVIE_API)
+            .then(res => res.json())
+            .then(data => {
+                setMovieInfo(data.data[0])
+                setYear(data.data[0].year)
+                setTitle(data.data[0].title)
+                setDescription(data.data[0].description)
+                setRating(data.data[0].rating)
+                setRuntime(data.data[0].runtime)
+                setTrailer(data.data[0].trailer)
+                setPosterImage()
+                setBackgroundImage()
+                setGenres()
+                setActors()
+                setActorsRoles()
+
+
+            })
+    }
 
 
     function onPosterChange() {
@@ -98,14 +130,14 @@ function Change() {
                         <i className="fa-solid fa-arrow-left"></i> Back
                     </Button>{' '}
                 </Link>
-                <h2 className="page-title">Add/Edit Movie</h2>
+                <h2 className="page-title">Edit Movie</h2>
                 <Form>
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
                         <Form.Label column sm="3">
                             Title:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={title} onChange={(event)=>{setTitle(event.target.value)}} placeholder="" />
+                            <Form.Control id="fee" type="text" value={title} onChange={(event)=>{setTitle(event.target.value)}} placeholder={`${movieInfo.title}`} />
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
@@ -113,7 +145,7 @@ function Change() {
                             Movie Description:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control as="textarea" value={description} onChange={(event)=>{setDescription(event.target.value)}} rows={3} />
+                            <Form.Control as="textarea" value={description} onChange={(event)=>{setDescription(event.target.value)}} rows={3} placeholder={`${movieInfo.synopsis}`} />
                         </Col>
                     </Form.Group>
 
@@ -131,7 +163,7 @@ function Change() {
                             IMDB Rating:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={rating} onChange={(event)=>{setRating(event.target.value)}} placeholder="" />
+                            <Form.Control type="text" value={rating} onChange={(event)=>{setRating(event.target.value)}} placeholder={`${movieInfo.rating}`} />
                         </Col>
                     </Form.Group>
 
@@ -142,6 +174,15 @@ function Change() {
                         <Col sm="9">
                             <Form.Control type="text" value={genres} onChange={(event)=>{setGenres(event.target.value)}} placeholder="" />
                         </Col>
+                        <select multiple className="form-control" id="exampleFormControlSelect2">
+                            {/*{*/}
+                            {/*    moviesInList.length > 0*/}
+                            {/*        ?*/}
+                            {/*            <option>1</option>*/}
+                            {/*        :*/}
+                            {/*        <option>1</option>*/}
+                            {/*}*/}
+                        </select>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
@@ -149,7 +190,7 @@ function Change() {
                             Runtime:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={runtime} onChange={(event)=>{setRuntime(event.target.value)}} placeholder="" />
+                            <Form.Control type="text" value={runtime} onChange={(event)=>{setRuntime(event.target.value)}} placeholder={`${movieInfo.runtime}`} />
                         </Col>
                     </Form.Group>
 
@@ -176,7 +217,7 @@ function Change() {
                             Trailer Link:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control as="textarea" value={trailer} onChange={(event)=>{setTrailer(event.target.value)}} rows={3} />
+                            <Form.Control as="textarea" value={trailer} onChange={(event)=>{setTrailer(event.target.value)}} rows={3} placeholder={`${movieInfo.trailer}`}/>
                         </Col>
                     </Form.Group>
 
@@ -262,6 +303,6 @@ function Change() {
     );
 }
 
-export default Change;
+export default EditMovie;
 
 

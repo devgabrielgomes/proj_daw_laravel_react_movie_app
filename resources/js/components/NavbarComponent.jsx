@@ -4,10 +4,6 @@ import "../../css/NavbarComponent.css";
 import Movie from "./Movie"
 import { Navbar, Nav, Container, Form, FormControl } from "react-bootstrap"
 
-const FEATURED_API = `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=api_key=3bf31c72f99e4189266c43358ac6e189&page=1`
-const SEARCH_API = `https://api.themoviedb.org/3/search/movie?api_key=3bf31c72f99e4189266c43358ac6e189&query=`
-
-
 const NavbarComponent = () => {
 
     return (
@@ -29,18 +25,18 @@ const NavbarComponent = () => {
                                 >
                                 </Nav>
                                 <Form className="d-flex">
-                                    <Nav.Link>
-                                        <Link className="nav--link" to="/">Home</Link>
-                                    </Nav.Link>
-                                    <Nav.Link>
-                                        <Link className="nav--link" to="/mylist">MyList</Link>
-                                    </Nav.Link>
-                                    <Nav.Link>
-                                        <Link className="nav--link" to="/management">Management</Link>
-                                    </Nav.Link>
-                                    <Nav.Link>
-                                        <Link className="nav--link" to="/management/change">Change</Link>
-                                    </Nav.Link>
+                                    <Link to="/">
+                                        <div className="nav--link">Home</div>
+                                    </Link>
+                                    <Link to="/my_list">
+                                        <div className="nav--link">MyList</div>
+                                    </Link>
+                                    <Link to="/management">
+                                        <div className="nav--link">Management</div>
+                                    </Link>
+                                    <Link to="/management/add_movie">
+                                        <div className="nav--link">Change</div>
+                                    </Link>
                                 </Form>
                             </Navbar.Collapse>
                         </Container>

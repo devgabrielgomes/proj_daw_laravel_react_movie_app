@@ -14,21 +14,30 @@ import {parseInt} from "lodash";
 function MovieInfo() {
     let params = useParams();
     let id = params.id
-    const MOVIE_API = `http://127.0.0.1:8000/api/v1/movies?id[eq]=${id}`
-    const IMAGE_API = `http://127.0.0.1:8000/api/v1/movie_images?id[eq]=${id}`
-    const GENRE_API = `http://127.0.0.1:8000/api/v1/genres?idMovie[eq]=${id}`
-    const GENRE_ID_API = `http://127.0.0.1:8000/api/v1/movie_genres?idMovie[eq]=${id}`
-    const ROLE_API = `http://127.0.0.1:8000/api/v1/roles?idMovie[eq]=${id}`
+    const MOVIE_API = `http://127.0.0.1:8000/api/movies`
+    const IMAGE_API = `http://127.0.0.1:8000/api/movie_images?id[eq]=${id}`
+    const GENRE_API = `http://127.0.0.1:8000/api/genres?idMovie[eq]=${id}`
+    const GENRE_ID_API = `http://127.0.0.1:8000/api/movie_genres?idMovie[eq]=${id}`
+    const ROLE_API = `http://127.0.0.1:8000/api/roles?idMovie[eq]=${id}`
+    const ACTOR_IMAGE_API = 'http://127.0.0.1:8000/api/actor_images'
+    const ACTOR_API = 'http://127.0.0.1:8000/api/actors'
+    const LIST_API = `http://127.0.0.1:8000/api/my_list_items`
 
-    const LIST_API = `https://api.themoviedb.org/3/list/8209568?api_key=3bf31c72f99e4189266c43358ac6e189`
-    const REMOVE_API = `https://api.themoviedb.org/3/list/8209568/remove_item?api_key=3bf31c72f99e4189266c43358ac6e189&session_id=b574b79cc4dbcadeead287a7fa1d15a82e54c305`
-    const ADD_LIST_API = `https://api.themoviedb.org/3/list/8209568/add_item?api_key=3bf31c72f99e4189266c43358ac6e189&session_id=b574b79cc4dbcadeead287a7fa1d15a82e54c305`
-    const [movieInfo, setMovieInfo] = useState({})
+    //const REMOVE_API = `https://api.themoviedb.org/3/list/8209568/remove_item?api_key=3bf31c72f99e4189266c43358ac6e189&session_id=b574b79cc4dbcadeead287a7fa1d15a82e54c305`
+    //const ADD_LIST_API = `https://api.themoviedb.org/3/list/8209568/add_item?api_key=3bf31c72f99e4189266c43358ac6e189&session_id=b574b79cc4dbcadeead287a7fa1d15a82e54c305`
     const [imageData, setImageData] = useState([])
+    const [movieInfo, setMovieInfo] = useState({})
     const [genresIdData, setGenresIdData] = useState([])
     const [genresData, setGenresData] = useState([])
     const [movieRoles, setMovieRoles] = useState([])
-    const [rolesData, setRolesData] = useState({})
+    const [actorsMovieId, setActorsMovieIds] = useState([])
+    const [actorsName, setActorsName] = useState([])
+    const [actorsMovieNames, setActorsMovieNames] = useState([])
+    const [actorsImageData, setActorsImageData] = useState([])
+    const [movieActorsPhoto, setMovieActorsPhoto] = useState([])
+    const [rolesData, setRolesData] = useState([])
+
+
     const [playTrailer, setPlayerTrailer] = useState(false)
     const [moviesInList, setMoviesInList] = useState([])
     const [creditsNamesData, setCreditsNameData] = useState([])
@@ -45,32 +54,33 @@ function MovieInfo() {
         getImageData(IMAGE_API)
         getGenresData(GENRE_API)
         getGenresIdData(GENRE_ID_API)
+        getActorsName(ACTOR_API)
         getRolesData(ROLE_API)
-        // getListData(LIST_API)
+        getActorsImageData(ACTOR_IMAGE_API)
+        getListData(LIST_API)
     }, [])
-
 
     //Movie Data
     async function getMovieData(MOVIE_API) {
         await fetch(MOVIE_API)
             .then(res => res.json())
             .then(data => {
-                console.log("Movie Data:")
-                console.log(data.data[0])
-                setMovieInfo(data.data[0])
+                console.log("data[id]:")
+                console.log(data[id])
+                setMovieInfo(data[id])
             })
     }
 
-    //Image Data
-    async function getImageData(IMAGE_API) {
-        await fetch(IMAGE_API)
-            .then(res => res.json())
-            .then(data => {
-                console.log("Images Data:")
-                console.log(data.data[0])
-                setImageData(data.data[0])
-            })
-    }
+    // //Image Data
+    // async function getImageData(IMAGE_API) {
+    //     await fetch(IMAGE_API)
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             // console.log("Images Data:")
+    //             // console.log(data.data[0])
+    //             setImageData(data.data[0])
+    //         })
+    // }
 
     //Genre Data
     async function getGenresData(GENRE_API) {
@@ -79,9 +89,6 @@ function MovieInfo() {
             .then(data => {
                 let moviePossibleGenres = [];
                 data.data.forEach(element => moviePossibleGenres.push(element.name));
-
-                console.log("Movie Possible Genres:")
-                console.log(moviePossibleGenres)
                 setGenresData(moviePossibleGenres)
             })
     }
@@ -93,10 +100,31 @@ function MovieInfo() {
             .then(data => {
                 let currentMovieGenresIds = [];
                 data.data.forEach(element => currentMovieGenresIds.push(element.idGenre));
-
-                console.log("GenresId Data:")
-                console.log(currentMovieGenresIds)
                 setGenresIdData(currentMovieGenresIds)
+            })
+    }
+
+    //Actors Images Data
+    async function getActorsImageData(ACTOR_IMAGE_API) {
+        await fetch(ACTOR_IMAGE_API)
+            .then(res => res.json())
+            .then(data => {
+                var actors_images = [];
+                data.data.forEach(element => actors_images.push(element.photo));
+                // console.log("actors_images:")
+                // console.log(actors_images)
+                setActorsImageData(actors_images)
+            })
+    }
+
+    //Actors Data
+    async function getActorsName(ACTOR_API) {
+        await fetch(ACTOR_API)
+            .then(res => res.json())
+            .then(data => {
+                var actors = [];
+                data.data.forEach(element => actors.push(element.name));
+                setActorsName(actors)
             })
     }
 
@@ -105,61 +133,35 @@ function MovieInfo() {
         await fetch(ROLE_API)
             .then(res => res.json())
             .then(data => {
-                var movieRoles = [];
-                var actorsIds = [];
+                var movieRoles = [], actorsInMovieIDs = [];
                 data.data.forEach(element => movieRoles.push(element.name));
-                data.data.forEach(element => actorsIds.push(element.idActor));
+                data.data.forEach(element => actorsInMovieIDs.push(element.idActor));
 
-                console.log("movieRoles:")
-                console.log(movieRoles)
-                console.log("actorsIds:")
-                console.log(actorsIds)
+                // console.log("actorsInMovieIDs:")
+                // console.log(actorsInMovieIDs)
+
                 setMovieRoles(movieRoles)
                 setRolesData(data.data)
+                setActorsMovieIds(actorsInMovieIDs)
             })
     }
 
-    var movieGenres = [];
+    //List Data
+    async function getListData(LIST_API) {
+        await fetch(LIST_API)
+            .then(res => res.json())
+            .then(data => {
+                // console.log("ListData:")
+                // console.log(data.data)
+                    setMoviesInList(data.data)
+            })
+    }
 
+    var movieGenres = [], actorsInMovie = [];
     genresIdData.forEach(element => movieGenres.push(genresData[element - 1]));
-    console.log("movieGenres:")
-    console.log(movieGenres)
+    actorsMovieId.forEach(element => actorsInMovie.push(actorsName[element - 1]));
 
     var hoursAndMinutes = parseInt(movieInfo.runtime / 60) + "h " + movieInfo.runtime % 60 + "m"
-
-
-    //List Data
-    // async function getListData(LIST_API) {
-    //     await fetch(LIST_API)
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             setMoviesInList(data.items)
-    //         })
-    // }
-
-    //Credits Data
-    // async function getCreditsData(CREDITS_API) {
-    //     await fetch(CREDITS_API)
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             var k = 0;
-    //             let tempCreditsNamesArray = [];
-    //             let tempCreditsPicArray = [];
-    //             let tempCreditsCharacterArray = [];
-    //             console.log(data)
-    //
-    //             while (k < 4) {
-    //                 tempCreditsNamesArray[k] = data.cast[k].name;
-    //                 tempCreditsPicArray[k] = IMG_API + data.cast[k].profile_path;
-    //                 tempCreditsCharacterArray[k] = data.cast[k].character;
-    //                 k += 1
-    //             }
-    //             setCreditsPicData(tempCreditsPicArray)
-    //             setCreditsNameData(tempCreditsNamesArray)
-    //             setCreditsCharacterData(tempCreditsCharacterArray)
-    //             console.log(tempCreditsCharacterArray)
-    //         })
-    // }
 
     let trailer_key = "";
     try {
@@ -175,8 +177,6 @@ function MovieInfo() {
 
     //checkIfMovieInList()
     //const trailer = selectedMovie.videos.results.find(vid -> vid.name === "Official Trailer")
-
-
 
     // function removeMovie(id) {
     //     const data = { "media_id": id };
@@ -268,27 +268,27 @@ function MovieInfo() {
                                     <h1>{movieInfo.title}</h1>
                                     <span className="movieinfo--release">{movieInfo.year}</span>
                                 </Col>
-                                {/*<Col className="movie-list-button" sm={2} xs={4} xxl={2}>*/}
-                                {/*    {moviesInList.find(mil => mil.id === movieInfo.id) ?*/}
-                                {/*        <motion.div*/}
-                                {/*            whileTap={{ scale: 0.9 }}*/}
-                                {/*        >*/}
-                                {/*            {<Button className="movie-list-button-option" variant="outline-danger" id="btn-remove-movie" onClick={handleShowRemoveModal}>*/}
-                                {/*                <i className="far fa-trash-alt"></i>  Remove from list*/}
-                                {/*            </Button>}*/}
-                                {/*        </motion.div>*/}
+                                <Col className="movie-list-button" sm={2} xs={4} xxl={2}>
+                                    {moviesInList.find(mil => mil.id === movieInfo.id) ?
+                                        <motion.div
+                                            whileTap={{ scale: 0.9 }}
+                                        >
+                                            {<Button className="movie-list-button-option" variant="outline-danger" id="btn-remove-movie">
+                                                <i className="far fa-trash-alt"></i>  Remove from list
+                                            </Button>}
+                                        </motion.div>
 
-                                {/*        :*/}
+                                        :
 
-                                {/*        <motion.div*/}
-                                {/*            whileTap={{ scale: 0.9 }}*/}
-                                {/*        >*/}
-                                {/*            {<Button className="movie-list-button-option" variant="outline-success" id="btn-add-movie" onClick={buttonAddMovieClick}>*/}
-                                {/*                <i className="fas fa-folder-plus"></i>  Add to my list*/}
-                                {/*            </Button>}*/}
-                                {/*        </motion.div>*/}
-                                {/*    }*/}
-                                {/*</Col>*/}
+                                        <motion.div
+                                            whileTap={{ scale: 0.9 }}
+                                        >
+                                            {<Button className="movie-list-button-option" variant="outline-success" id="btn-add-movie">
+                                                <i className="fas fa-folder-plus"></i>  Add to my list
+                                            </Button>}
+                                        </motion.div>
+                                    }
+                                </Col>
                             </Row>
                             <Row className="movie-details">
                                 <Row>
@@ -312,15 +312,6 @@ function MovieInfo() {
                     </Row>
                 </div>
 
-                <Col>*/}
-                    {/*<Row className="actor-container">*/}
-                    {/*    <img id="actor-pic" src={} alt={"TESTE"}></img>*/}
-                    {/*</Row>*/}
-                    <Row>
-                        <span className="actor-name"><b>{}</b> <br></br> as {"creditsCharacterData[0]"}</span>
-                    </Row>
-                </Col>
-
                 <div className="movieinfo-extra">
                     <Row className="movieinfo-extra-row">
                         <Col className="main-actors" xxl={3} xl={2} lg={3} md={3}>
@@ -332,38 +323,38 @@ function MovieInfo() {
                                     <Row className="actor-row">
                                         <Col>
                                             <Row className="actor-container">
-                                                <img id="actor-pic" src={`/uploads/actor_images/${imageData.photo}`} alt="idk"></img>
+                                                <img id="actor-pic" src={`/uploads/actor_images/${actorsImageData[actorsMovieId[0] - 1]}`} alt={actorsInMovie[0]}></img>
                                             </Row>
                                             <Row>
-                                                <span className="actor-name"><b>{movieRoles[0]}</b> <br></br> as </span>
+                                                <span className="actor-name"><b>{actorsInMovie[0]}</b> <br></br> as {movieRoles[0]}</span>
                                             </Row>
                                         </Col>
                                         <Col>
-                                            {/*<Row className="actor-container">*/}
-                                            {/*    <img id="actor-pic" src={creditsPicData[1]} alt={creditsNamesData[1]}></img>*/}
-                                            {/*</Row>*/}
+                                            <Row className="actor-container">
+                                                <img id="actor-pic" src={`/uploads/actor_images/${actorsImageData[actorsMovieId[1] - 1]}`} alt={actorsInMovie[1]}></img>
+                                            </Row>
                                             <Row>
-                                                <span className="actor-name"><b>{movieRoles[1]}</b> <br></br> as </span>
+                                                <span className="actor-name"><b>{actorsInMovie[1]}</b> <br></br> as {movieRoles[1]}</span>
                                             </Row>
                                         </Col>
                                     </Row>
                                     <Row className="actor-row">
                                         <Col>
-                                            {/*<Row className="actor-container">*/}
-                                            {/*    <img id="actor-pic" src={creditsPicData[2]} alt={creditsNamesData[2]}></img>*/}
-                                            {/*</Row>*/}
+                                            <Row className="actor-container">
+                                                <img id="actor-pic" src={`/uploads/actor_images/${actorsImageData[actorsMovieId[2] - 1]}`} alt={actorsInMovie[2]}></img>
+                                            </Row>
                                             <Row>
-                                                <span className="actor-name"><b>{movieRoles[2]}</b> <br></br> as </span>
+                                                <span className="actor-name"><b>{actorsInMovie[2]}</b> <br></br> as {movieRoles[2]}</span>
                                             </Row>
                                         </Col>
-                                        {/*<Col>*/}
-                                        {/*    <Row className="actor-container">*/}
-                                        {/*        <img id="actor-pic" src={creditsPicData[3]} alt={creditsNamesData[3]}></img>*/}
-                                        {/*    </Row>*/}
-                                        {/*    <Row>*/}
-                                        {/*        <span className="actor-name"><b>{creditsNamesData[3]}</b> <br></br> as {creditsCharacterData[3]}</span>*/}
-                                        {/*    </Row>*/}
-                                        {/*</Col>*/}
+                                        <Col>
+                                            <Row className="actor-container">
+                                                <img id="actor-pic" src={`/uploads/actor_images/${actorsImageData[actorsMovieId[3] - 1]}`} alt={actorsInMovie[3]}></img>
+                                            </Row>
+                                            <Row>
+                                                <span className="actor-name"><b>{actorsInMovie[3]}</b> <br></br> as {movieRoles[3]}</span>
+                                            </Row>
+                                        </Col>
                                     </Row>
                                 </Col>
                             </Row >

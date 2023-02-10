@@ -29,5 +29,9 @@ class Movie extends Model
     public function myListsItems() {
         return $this->hasMany(Mylistitem::class);
     }
+
+    public function movieImages() {
+        return $this->hasMany(Movieimage::class);
+    }
 }
 

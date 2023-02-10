@@ -11,6 +11,7 @@ use App\Models\Movie;
 use App\Filters\V1\MovieFilter;
 use Illuminate\Http\Request;
 //use App\Http\Requests\V1\StoreMovieRequest;
+use Illuminate\Support\Facades\DB;
 
 class MovieController extends Controller
 {
@@ -30,7 +31,19 @@ class MovieController extends Controller
 
             return new MovieCollection($movies->appends($request->query()));
         }
+
     }
+
+    public function getMovies()
+    {
+        $results = DB::table('movies')
+            ->join('movie_images', 'movie_images.fk_id_movie', '=', 'movies.id')
+            ->select('movies.*','movie_images.cover as cover', 'movie_images.background as background')
+            ->get();
+
+        return $results;
+    }
+
 
     /**
      * Store a newly created resource in storage.

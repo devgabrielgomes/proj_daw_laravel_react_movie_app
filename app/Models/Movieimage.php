@@ -10,7 +10,13 @@ class Movieimage extends Model
     protected $table='movie_images';
     use HasFactory;
 
+    protected $fillable = [
+        'idMovie',
+        'cover',
+        'background',
+    ];
+
     public function movies() {
-        return $this->hasOne(Movie::class);
+        return $this->belongsTo(Movie::class);
     }
 }

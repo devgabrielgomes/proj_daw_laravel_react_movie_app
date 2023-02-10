@@ -6,11 +6,11 @@ import { AnimatePresence } from "framer-motion";
 import Mylist from "../components/pages/Mylist"
 import Home from "../components/pages/Home"
 import MovieInfo from '../components/pages/MovieInfo';
-import Change from "../components/movies/Change";
+import EditMovie from "../components/movies/EditMovie.jsx";
 import Index from "../components/movies/Index";
 import NotFound from "../components/NotFound";
 import Management from "../components/movies/Management";
-import NewMovie from "../components/movies/New";
+import AddMovie from "@/components/movies/AddMovie";
 
 function Router() {
     const location = useLocation();
@@ -19,11 +19,11 @@ function Router() {
             <AnimatePresence>
                 <Routes location={location} key={location.pathname}>
                     <Route path="/" element={<Home />} />
-                    <Route path="/mylist" element={<Mylist />} />
+                    <Route path="/my_list" element={<Mylist />} />
                     <Route path="/movieinfo/:id" element={<MovieInfo />} />
-                    <Route path="/management/change" element={<Change />} />
                     <Route path="/management" element={<Management />} />
-                    <Route path="/movie/new" element={<NewMovie />} />
+                    <Route path="/management/add_movie" element={<AddMovie />} />
+                    <Route path="/management/edit_movie/:id" element={<EditMovie />} />
                     <Route path="/*" element={<NotFound />} />
                 </Routes>
             </AnimatePresence>

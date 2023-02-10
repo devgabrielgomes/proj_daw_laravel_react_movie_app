@@ -10,6 +10,7 @@ use App\Http\Resources\V1\RoleCollection;
 use App\Http\Resources\V1\RoleResource;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
 {
@@ -29,6 +30,17 @@ class RoleController extends Controller
 
             return new RoleCollection($roles->appends($request->query()));
         }
+    }
+
+    public function innerJoin()
+    {
+        $result = DB::table('roles')
+            ->join('actors', 'actors.id', '=', 'roles.fk_id_actor')
+            ->join('actor_images', 'actor_images.id', '=', 'actors.id')
+            ->select('roles.id', 'roles.fk_id_movie as idMovie', 'actors.name as actorName', 'roles.name', 'actor_images.photo as actorPhoto')
+            ->get();
+
+        return $result;
     }
 
 

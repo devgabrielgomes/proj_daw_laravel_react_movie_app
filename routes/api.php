@@ -19,13 +19,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //Route::post('/add_movie', [MovieController::class, 'add_movie']);
-Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1'], function() {
+Route::group(['namespace' => 'App\Http\Controllers\V1'], function() {
+    Route::get('movies', [App\Http\Controllers\V1\MovieController::class, 'getMovies']);
+    //Route::apiResource('movies', MovieController::class);
     Route::apiResource('actors', ActorController::class);
     Route::apiResource('genres', GenreController::class);
     Route::apiResource('movie_genres', MoviegenreController::class);
-    Route::apiResource('movies', MovieController::class);
     Route::apiResource('movie_images', MovieimageController::class);
-    Route::apiResource('actor_images', MovieimageController::class);
+    Route::apiResource('actor_images', ActorimageController::class);
     Route::apiResource('my_lists', MylistController::class);
     Route::apiResource('my_list_items', MylistitemController::class);
     Route::apiResource('roles', RoleController::class);
