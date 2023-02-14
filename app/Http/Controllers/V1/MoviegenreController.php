@@ -11,6 +11,7 @@ use App\Http\Resources\V1\MoviegenreCollection;
 use App\Http\Resources\V1\MoviegenreResource;
 use App\Models\Moviegenre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MoviegenreController extends Controller
 {
@@ -32,6 +33,15 @@ class MoviegenreController extends Controller
         }
     }
 
+    public function getMovieGenres()
+    {
+        $result = DB::table('movie_genres')
+            ->join('genres', 'movie_genres.fk_id_genre', '=', 'genres.id')
+            ->select('movie_genres.id', 'movie_genres.fk_id_movie as idMovie', 'genres.*')
+            ->get();
+
+        return $result;
+    }
     /**
      * Store a newly created resource in storage.
      *

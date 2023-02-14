@@ -9,6 +9,7 @@ use App\Http\Resources\V1\MovieResource;
 use App\Http\Resources\V1\MovieCollection;
 use App\Models\Movie;
 use App\Filters\V1\MovieFilter;
+use App\Models\Mylistitem;
 use Illuminate\Http\Request;
 //use App\Http\Requests\V1\StoreMovieRequest;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,20 @@ class MovieController extends Controller
             ->get();
 
         return $results;
+    }
+
+
+    public function addMovie(Request $request)
+    {
+        $movie = new Movie();
+
+        $movie->title = $request->title;
+        $movie->year = $request->year;
+        $movie->rating = $request->rating;
+        $movie->synopsis = $request->synopsis;
+        $movie->trailer = $request->trailer;
+        $movie->runtime = $request->runtime;
+        $movie->save();
     }
 
 

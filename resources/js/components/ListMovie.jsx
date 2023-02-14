@@ -6,26 +6,11 @@ import { motion } from "framer-motion";
 import star from "./images/star.png";
 import "../../css/ListMovie.css";
 
-const ListMovie = ({ movie, removeMovie }) => {
+function ListMovie ({ movie: { id, title, year, rating, cover}, removeMovie}) {
     const [showModal, setShowModal] = useState(false)
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
     const [show, setShow] = useState(false);
-    const IMAGE_API = `http://127.0.0.1:8000/api/movie_images?id[eq]=${movie.id}`
-    const [imageData, setImageData] = useState([])
-
-    useEffect(() => {
-        getImageData(IMAGE_API)
-    }, [])
-
-    //Image Data
-    async function getImageData(IMAGE_API) {
-        await fetch(IMAGE_API)
-            .then(res => res.json())
-            .then(data => {
-                setImageData(data.data[0])
-            })
-    }
 
     return (
         <>
@@ -34,15 +19,15 @@ const ListMovie = ({ movie, removeMovie }) => {
                     whileTap={{ scale: 0.9 }}
                 >
                     <div className="movie-info-container">
-                        <Link style={{ textDecoration: 'none', color: "white" }} to={`/movieinfo/${movie.id}`}>
-                            <img className="movie-poster" src={`/uploads/movie_images/cover/${imageData.cover}`} alt="poster" />
+                        <Link style={{ textDecoration: 'none', color: "white" }} to={`/movie_info/${id}`}>
+                            <img className="movie-poster" src={`/uploads/movie_images/cover/${cover}`} alt="poster" />
                             <div className="movie-info">
-                                <h4>{movie.title ? movie.title : movie.name}</h4>
-                                <span>{2010}</span>
+                                <h4>{title}</h4>
+                                <span>{year}</span>
                             </div>
                             <div className="movie-over">
                                 <div className="movie-rating">
-                                    <h2>{movie.rating}</h2>
+                                    <h2>{rating}</h2>
                                     <img src={star} alt="star" />
                                 </div>
                                 <button type="button" className="btn btn-outline-primary">
@@ -59,7 +44,7 @@ const ListMovie = ({ movie, removeMovie }) => {
                     <Button
                         className="remove--button"
                         variant="outline-danger"
-                        key={movie.id} id={"remove_btn_" + movie.id}
+                        key={id} id={"remove_btn_" + id}
                         onClick={handleShowModal}>
                         <i className="far fa-trash-alt"></i> Remove from the list
                     </Button>{' '}
@@ -74,7 +59,7 @@ const ListMovie = ({ movie, removeMovie }) => {
                     <Button variant="secondary" onClick={handleCloseModal}>
                         No
                     </Button>
-                    <Button variant="btn btn-danger" onClick={() => removeMovie(movie.id, movie.title ? movie.title : movie.name)}>
+                    <Button variant="btn btn-danger" onClick={() => removeMovie(id, title)}>
                         Yes
                     </Button>
                 </Modal.Footer>

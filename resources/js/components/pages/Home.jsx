@@ -25,6 +25,7 @@ const Home = () => {
             .then(res => res.json())
             .then(data => {
                 if (data.length > 0) {
+                    console.log("movies:")
                     console.log(data)
                     setMovies(data)
                 } else {

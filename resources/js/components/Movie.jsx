@@ -1,34 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import "../../css/Movie.css";
-import {Link, useParams} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import { motion } from "framer-motion";
 import star from "./images/star.png";
 
 
 function Movie({ movie: { id, title, year, rating, cover} }) {
-    // const IMAGE_API = `http://127.0.0.1:8000/api/movie_images?id[eq]=${id}`
-    // const [coverData, setCoverData] = useState([])
-
-    // useEffect(() => {
-    //     getMovieCover(IMAGE_API)
-    // }, [])
-
-    // //Image Data
-    // async function getMovieCover(MOVIE_API) {
-    //     await fetch(MOVIE_API)
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             setCoverData(data.data[0].cover)
-    //         })
-    // }
-
     return (
         <>
             <motion.div
                 className="movie"
                 whileTap={{scale: 0.9}}
             >
-                <Link style={{textDecoration: 'none', color: "white"}} to={`/movieinfo/${id}`}>
+                <Link style={{textDecoration: 'none', color: "white"}} to={`/movie_info/${id}`}>
                     <div>
                         <img className="movie-poster" src={`/uploads/movie_images/cover/${cover}`} alt="poster"/>
                         <div className="movie-info">

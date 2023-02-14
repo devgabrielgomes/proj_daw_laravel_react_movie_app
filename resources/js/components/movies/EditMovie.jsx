@@ -8,11 +8,16 @@ import { motion } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ListMovie from "@/components/ListMovie";
+import {parseInt} from "lodash";
+import {forIn} from "lodash/object";
 
 function EditMovie() {
     let params = useParams();
     let id = params.id
-    const MOVIE_API = `http://127.0.0.1:8000/api/movies/${id}`
+    const MOVIE_API = `http://127.0.0.1:8000/api/movies`
+    const MOVIE_GENRE_API = `http://127.0.0.1:8000/api/movie_genres/`
+    const GENRE_API = `http://127.0.0.1:8000/api/genres/`
+    const ROLE_API = `http://127.0.0.1:8000/api/roles`
     const [movieInfo, setMovieInfo] = useState({})
     const navigate = useNavigate()
     const [title, setTitle] = useState("");
@@ -20,19 +25,22 @@ function EditMovie() {
     const [year, setYear] = useState("");
     const [rating, setRating] = useState("");
     const [genres, setGenres] = useState("");
+    const [movieGenres, setMovieGenres] = useState("");
     const [runtime, setRuntime] = useState("");
-    const [actors, setActors] = useState("");
+    const [movieActors, setMovieActors] = useState("");
     const [actorsRoles, setActorsRoles] = useState("");
     const [trailer, setTrailer] = useState("");
     const [poster, setPoster] = useState();
-    const [posterImage, setPosterImage] = useState();
+    const [posterImage, setPosterImage] = useState("");
     const [background, setBackground] = useState();
-    const [backgroundImage, setBackgroundImage] = useState();
+    const [backgroundImage, setBackgroundImage] = useState("");
 
 
     useEffect(() => {
         getMovieData(MOVIE_API)
-
+        getGenresData(GENRE_API)
+        getMovieGenresData(MOVIE_GENRE_API)
+        getRolesData(ROLE_API)
     }, [])
 
     useEffect(() => {
@@ -64,22 +72,74 @@ function EditMovie() {
         await fetch(MOVIE_API)
             .then(res => res.json())
             .then(data => {
-                setMovieInfo(data.data[0])
-                setYear(data.data[0].year)
-                setTitle(data.data[0].title)
-                setDescription(data.data[0].description)
-                setRating(data.data[0].rating)
-                setRuntime(data.data[0].runtime)
-                setTrailer(data.data[0].trailer)
-                setPosterImage()
-                setBackgroundImage()
-                setGenres()
-                setActors()
-                setActorsRoles()
+                console.log("data[id]:")
+                console.log(data[id - 1])
+                setMovieInfo(data[id - 1])
+                setYear(data[id - 1].year)
+                setTitle(data[id - 1].title)
+                setDescription(data[id - 1].synopsis)
+                setRating(data[id - 1].rating)
+                setRuntime(data[id - 1].runtime)
+                setTrailer(data[id - 1].trailer)
+                setPosterImage(data[id - 1].cover)
+                setBackgroundImage(data[id - 1].background)
+            })
+    }
 
+    //Genre Data
+    async function getGenresData(GENRE_API) {
+        await fetch(GENRE_API)
+            .then(res => res.json())
+            .then(data => {
+                let all_genres = [];
+                for (let i = 0; i < data.data.length; i++) {
+                    all_genres[i] = data.data[i].name
+                }
+                console.log("all_genres:")
+                console.log(all_genres)
+                setGenres(all_genres)
+            })
+    }
+
+    //Genre Data
+    async function getMovieGenresData(MOVIE_GENRE_API) {
+        await fetch(MOVIE_GENRE_API)
+            .then(res => res.json())
+            .then(data => {
+                let movie_genres = [];
+
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].idMovie == id) {
+                        movie_genres.push(data[i].name)
+                    }
+                }
+
+                console.log("movie_genres:")
+                console.log(movie_genres)
+                setMovieGenres(movie_genres)
+            })
+    }
+
+    //Roles Data
+    async function getRolesData(ROLE_API) {
+        await fetch(ROLE_API)
+            .then(res => res.json())
+            .then(data => {
+                var actors_name = [], movie_roles = [], actor_pic = [];
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].idMovie == parseInt(id)) {
+                        actors_name.push(data[i].actorName)
+                        movie_roles.push(data[i].roleName)
+                        actor_pic.push(data[i].actorPhoto)
+                    }
+                }
+                setMovieActors(actors_name)
+                setActorsRoles(movie_roles)
+                //setActorsImage(actor_pic)
 
             })
     }
+
 
 
     function onPosterChange() {
@@ -121,6 +181,7 @@ function EditMovie() {
             })
     }
 
+    let test;
     return (
         <>
             <NavbarComponent />
@@ -137,7 +198,7 @@ function EditMovie() {
                             Title:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control id="fee" type="text" value={title} onChange={(event)=>{setTitle(event.target.value)}} placeholder={`${movieInfo.title}`} />
+                            <Form.Control type="text" value={title} onChange={(event)=>{setTitle(event.target.value)}} placeholder="" />
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
@@ -145,7 +206,7 @@ function EditMovie() {
                             Movie Description:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control as="textarea" value={description} onChange={(event)=>{setDescription(event.target.value)}} rows={3} placeholder={`${movieInfo.synopsis}`} />
+                            <Form.Control as="textarea" value={description} onChange={(event)=>{setDescription(event.target.value)}} rows={5} placeholder="" />
                         </Col>
                     </Form.Group>
 
@@ -163,7 +224,7 @@ function EditMovie() {
                             IMDB Rating:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={rating} onChange={(event)=>{setRating(event.target.value)}} placeholder={`${movieInfo.rating}`} />
+                            <Form.Control type="text" value={rating} onChange={(event)=>{setRating(event.target.value)}} placeholder="" />
                         </Col>
                     </Form.Group>
 
@@ -172,25 +233,30 @@ function EditMovie() {
                             Genres:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={genres} onChange={(event)=>{setGenres(event.target.value)}} placeholder="" />
+                            <Form.Control type="text" value={movieGenres} onChange={(event)=>{setMovieGenres(event.target.value)}} placeholder="" />
                         </Col>
-                        <select multiple className="form-control" id="exampleFormControlSelect2">
-                            {/*{*/}
-                            {/*    moviesInList.length > 0*/}
-                            {/*        ?*/}
-                            {/*            <option>1</option>*/}
-                            {/*        :*/}
-                            {/*        <option>1</option>*/}
-                            {/*}*/}
-                        </select>
                     </Form.Group>
+
+                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                        <Form.Label column sm="3">
+                            Select the new movie genres while pressing "Ctrl" button:
+                        </Form.Label>
+                        <Col sm="9">
+                            <select multiple className="form-control" id="exampleFormControlSelect2">
+                                {genres.length > 0 && genres.map(genre => (
+                                    <option id={genre}>{genre}</option>
+                                ))}
+                            </select>
+                        </Col>
+                    </Form.Group>
+
 
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
                         <Form.Label column sm="3">
                             Runtime:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={runtime} onChange={(event)=>{setRuntime(event.target.value)}} placeholder={`${movieInfo.runtime}`} />
+                            <Form.Control type="text" value={runtime} onChange={(event)=>{setRuntime(event.target.value)}} placeholder="" />
                         </Col>
                     </Form.Group>
 
@@ -199,7 +265,7 @@ function EditMovie() {
                             Main Actors:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control as="textarea" value={actors} onChange={(event)=>{setActors(event.target.value)}} rows={3} />
+                            <Form.Control type="text" value={movieActors} onChange={(event)=>{setActors(event.target.value)}} />
                         </Col>
                     </Form.Group>
 
@@ -208,17 +274,18 @@ function EditMovie() {
                             Main Actors Roles:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control as="textarea" value={actorsRoles} onChange={(event)=>{setActorsRoles(event.target.value)}} rows={3} />
+                            <Form.Control type="text" value={actorsRoles} onChange={(event)=>{setActorsRoles(event.target.value)}}/>
                         </Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
                         <Form.Label column sm="3">
-                            Trailer Link:
+                            Trailer ID:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control as="textarea" value={trailer} onChange={(event)=>{setTrailer(event.target.value)}} rows={3} placeholder={`${movieInfo.trailer}`}/>
+                            <Form.Control type="text" value={trailer} onChange={(event)=>{setTrailer(event.target.value)}} placeholder=""/>
                         </Col>
+
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
@@ -244,7 +311,7 @@ function EditMovie() {
                             </Form.Group>
                         </Col>
                         <Col sm="2">
-                            <img className="movie-poster" src={posterImage} alt="movie-pos" className="img-thumbnail"></img>
+                            <img className="movie-poster" src={`/uploads/movie_images/cover/${posterImage}`} alt="movie-pos" className="img-thumbnail"></img>
                         </Col>
                     </Form.Group>
 
@@ -273,7 +340,7 @@ function EditMovie() {
                             </Form.Group>
                         </Col>
                         <Col sm="2">
-                            <img className="movie-background" src={backgroundImage} alt="movie-bkg" className="img-thumbnail"></img>
+                            <img className="movie-background" src={`/uploads/movie_images/background/${backgroundImage}`} alt="movie-bkg" className="img-thumbnail"></img>
                         </Col>
                     </Form.Group>
 

@@ -14,8 +14,3 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\V1\MovieController::class, 'index'])->name('home');
-
-
-
-
-Route::get('inner-join-roles', [App\Http\Controllers\V1\RoleController::class, 'innerJoin']);

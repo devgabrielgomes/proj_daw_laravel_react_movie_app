@@ -9,40 +9,24 @@ import 'react-toastify/dist/ReactToastify.css';
 import ListMovie from "@/components/ListMovie";
 
 const MOVIE_API = `http://127.0.0.1:8000/api/movies`
-const IMAGE_API = `http://127.0.0.1:8000/api/movie_images`
 
 function Management() {
-    const [moviesCover, setMoviesCover] = useState([])
     const [movies, setMovies] = useState([])
 
     useEffect(() => {
         getMovies(MOVIE_API)
-        getMoviesCover(IMAGE_API)
     }, [])
 
-    //Image Data
-    async function getMoviesCover(IMAGE_API) {
-        await fetch(IMAGE_API)
-            .then(res => res.json())
-            .then(data => {
-                var movie_covers = [];
-                data.data.forEach(element => movie_covers.push(element.cover));
-                console.log("movie_covers:")
-                console.log(movie_covers)
-                setMoviesCover(movie_covers)
-            })
-    }
 
     async function getMovies(MOVIE_API) {
         await fetch(MOVIE_API)
             .then(res => res.json())
             .then(data => {
                 console.log("getMovies:")
-                console.log(data.data)
-                setMovies(data.data)
+                console.log(data)
+                setMovies(data)
             })
     }
-
 
     return (
         <>
@@ -81,7 +65,7 @@ function Management() {
                                                 {movie.id}
                                             </td>
                                             <td>
-                                                <img src={`/uploads/movie_images/cover/${moviesCover[movie.id - 1]}`} width="80px" alt="movie-poster"></img>
+                                                <img src={`/uploads/movie_images/cover/${movie.cover}`} width="80px" alt="movie-poster"></img>
                                             </td>
                                             <td className="title">{movie.title}</td>
                                             <td>
@@ -107,18 +91,18 @@ function Management() {
                 </Table>
             </div>
             </motion.div>
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="dark"
-            />
+            {/*<ToastContainer*/}
+            {/*    position="top-right"*/}
+            {/*    autoClose={5000}*/}
+            {/*    hideProgressBar={false}*/}
+            {/*    newestOnTop={false}*/}
+            {/*    closeOnClick*/}
+            {/*    rtl={false}*/}
+            {/*    pauseOnFocusLoss*/}
+            {/*    draggable*/}
+            {/*    pauseOnHover*/}
+            {/*    theme="dark"*/}
+            {/*/>*/}
         </>
     );
 }

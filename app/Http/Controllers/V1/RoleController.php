@@ -32,12 +32,12 @@ class RoleController extends Controller
         }
     }
 
-    public function innerJoin()
+    public function getRoles()
     {
         $result = DB::table('roles')
             ->join('actors', 'actors.id', '=', 'roles.fk_id_actor')
             ->join('actor_images', 'actor_images.id', '=', 'actors.id')
-            ->select('roles.id', 'roles.fk_id_movie as idMovie', 'actors.name as actorName', 'roles.name', 'actor_images.photo as actorPhoto')
+            ->select('roles.id', 'roles.fk_id_movie as idMovie', 'actors.name as actorName', 'roles.name as roleName', 'actor_images.photo as actorPhoto')
             ->get();
 
         return $result;
