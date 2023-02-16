@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Actor extends Model
 {
     use HasFactory;
+    public $timestamps = false;
 
     public function roles() {
         return $this->hasOne(Role::class);

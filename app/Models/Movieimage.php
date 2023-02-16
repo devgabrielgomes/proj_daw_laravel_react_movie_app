@@ -9,9 +9,10 @@ class Movieimage extends Model
 {
     protected $table='movie_images';
     use HasFactory;
+    public $timestamps = false;
 
     protected $fillable = [
-        'idMovie',
+        'fk_id_movie',
         'cover',
         'background',
     ];

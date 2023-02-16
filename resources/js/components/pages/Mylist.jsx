@@ -7,16 +7,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Movie from "@/components/Movie";
 
-const GET_LIST_MOVIES_API = `http://127.0.0.1:8000/api/get_list_movies`
-const REMOVE_LIST_API = `http://127.0.0.1:8000/api/my_list_items/remove_movie/`
+const GET_LIST_MOVIES_API = `http://localhost:8000/api/get_list_movies`
+const REMOVE_LIST_API = `http://localhost:8000/api/my_list_items/remove_movie/`
 
 
 function Mylist() {
     const [listMovies, setListMovies] = useState([])
-    const [show, setShow] = useState(false);
     const [showRemoveModal, setShowRemoveModal] = useState(false)
     const handleCloseRemoveModal = () => setShowRemoveModal(false);
-    const handleShowRemoveModal = () => setShowRemoveModal(true);
 
 
     useEffect(() => {
@@ -73,7 +71,7 @@ function Mylist() {
                         <div className="movie-container">
                             {listMovies.length > 0 && listMovies.map(movie => (
                                 <>
-                                    <ListMovie movie={movie} key={movie.id} removeMovie={removeMovie}/>
+                                    <ListMovie movie={movie} key={"list_movie_" + movie.id} removeMovie={removeMovie}/>
                                 </>
                             ))}
                         </div>

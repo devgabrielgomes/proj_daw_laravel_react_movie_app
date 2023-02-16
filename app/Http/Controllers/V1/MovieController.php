@@ -59,6 +59,11 @@ class MovieController extends Controller
         $movie->save();
     }
 
+    public function removeMovie($id)
+    {
+        $item = Movie::where('id', '=', $id);
+        $item->delete();
+    }
 
     /**
      * Store a newly created resource in storage.

@@ -52,7 +52,7 @@ class MylistitemController extends Controller
         $my_list_item->save();
     }
 
-    public function deleteMyListItem($id) {
+    public function removeMyListItem($id) {
         $item = Mylistitem::where('fk_id_movie', '=', $id);
         $item->delete();
     }

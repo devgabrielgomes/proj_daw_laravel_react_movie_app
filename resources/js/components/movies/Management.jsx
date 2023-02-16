@@ -7,11 +7,16 @@ import { motion } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ListMovie from "@/components/ListMovie";
+import Modal from "react-bootstrap/Modal";
+import ManagementMovie from "@/components/ManagementMovie";
 
-const MOVIE_API = `http://127.0.0.1:8000/api/movies`
+const MOVIE_API = `http://localhost:8000/api/movies`
+const REMOVE_MOVIE_API = `http://localhost:8000/api/movies/remove_movie/`
 
 function Management() {
     const [movies, setMovies] = useState([])
+    const [showRemoveModal, setShowRemoveModal] = useState(false)
+    const handleCloseRemoveModal = () => setShowRemoveModal(false);
 
     useEffect(() => {
         getMovies(MOVIE_API)
@@ -25,6 +30,25 @@ function Management() {
                 console.log("getMovies:")
                 console.log(data)
                 setMovies(data)
+            })
+    }
+
+    const removeMovie = async (id, title) => {
+        console.log(id);
+        axios.delete(REMOVE_MOVIE_API + id)
+            .then(() => {
+                getMovies(MOVIE_API)
+                handleCloseRemoveModal()
+                toast.error(`You just removed "${title}" from your list!`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
             })
     }
 
@@ -60,27 +84,7 @@ function Management() {
                             <>
                                 {movies.length > 0 && movies.map(movie => (
                                     <>
-                                        <tr key={movie.id}>
-                                            <td className="number">
-                                                {movie.id}
-                                            </td>
-                                            <td>
-                                                <img src={`/uploads/movie_images/cover/${movie.cover}`} width="80px" alt="movie-poster"></img>
-                                            </td>
-                                            <td className="title">{movie.title}</td>
-                                            <td>
-                                                <div className="button-container">
-                                                    <Link to={`/management/edit_movie/${movie.id}`}>
-                                                        <Button className="edit-button block" variant="primary">
-                                                            <i className="far fa-edit"></i> Edit
-                                                        </Button>{' '}
-                                                    </Link>
-                                                    <Button className="delete-button block" variant="danger">
-                                                        <i className="far fa-trash-alt"></i> Delete
-                                                    </Button>{' '}
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        <ManagementMovie movie={movie} key={"management_movie_" + movie.id} removeMovie={removeMovie}/>
                                     </>
                                 ))}
                             </>
@@ -91,18 +95,19 @@ function Management() {
                 </Table>
             </div>
             </motion.div>
-            {/*<ToastContainer*/}
-            {/*    position="top-right"*/}
-            {/*    autoClose={5000}*/}
-            {/*    hideProgressBar={false}*/}
-            {/*    newestOnTop={false}*/}
-            {/*    closeOnClick*/}
-            {/*    rtl={false}*/}
-            {/*    pauseOnFocusLoss*/}
-            {/*    draggable*/}
-            {/*    pauseOnHover*/}
-            {/*    theme="dark"*/}
-            {/*/>*/}
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
+
         </>
     );
 }

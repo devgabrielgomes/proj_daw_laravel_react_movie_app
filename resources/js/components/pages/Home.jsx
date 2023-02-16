@@ -9,7 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 //const FEATURED_API = `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=3bf31c72f99e4189266c43358ac6e189&page=1`
-const FEATURED_API = `http://127.0.0.1:8000/api/movies`
+const FEATURED_API = `http://localhost:8000/api/movies`
 //const SEARCH_API = `https://api.themoviedb.org/3/search/movie?api_key=3bf31c72f99e4189266c43358ac6e189&language=en-US&page=1&include_adult=false&query=`
 
 const Home = () => {

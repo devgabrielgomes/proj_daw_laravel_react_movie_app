@@ -14,12 +14,12 @@ import {parseInt} from "lodash";
 function MovieInfo() {
     let params = useParams();
     let id = params.id
-    const MOVIE_API = `http://127.0.0.1:8000/api/movies`
-    const GENRE_API = `http://127.0.0.1:8000/api/movie_genres/`
-    const ROLE_API = `http://127.0.0.1:8000/api/roles`
-    const LIST_ITEMS_API = `http://127.0.0.1:8000/api/my_list_items`
-    const ADD_LIST_API = `http://127.0.0.1:8000/api/my_list_items/add_movie`
-    const REMOVE_LIST_API = `http://127.0.0.1:8000/api/my_list_items/remove_movie/`
+    const MOVIE_API = `http://localhost:8000/api/movies`
+    const GENRE_API = `http://localhost:8000/api/movie_genres/`
+    const ROLE_API = `http://localhost:8000/api/roles`
+    const LIST_ITEMS_API = `http://localhost:8000/api/my_list_items`
+    const ADD_LIST_API = `http://localhost:8000/api/my_list_items/add_movie`
+    const REMOVE_LIST_API = `http://localhost:8000/api/my_list_items/remove_movie/`
 
     const [movieInfo, setMovieInfo] = useState([])
     const [genresData, setGenresData] = useState([])
@@ -30,7 +30,6 @@ function MovieInfo() {
 
     const [playTrailer, setPlayerTrailer] = useState(false)
 
-    const [show, setShow] = useState(false);
     const [showRemoveModal, setShowRemoveModal] = useState(false)
     const handleCloseRemoveModal = () => setShowRemoveModal(false);
     const handleShowRemoveModal = () => setShowRemoveModal(true);

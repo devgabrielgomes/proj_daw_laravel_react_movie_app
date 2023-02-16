@@ -10,7 +10,6 @@ function ListMovie ({ movie: { id, title, year, rating, cover}, removeMovie}) {
     const [showModal, setShowModal] = useState(false)
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
-    const [show, setShow] = useState(false);
 
     return (
         <>
@@ -51,7 +50,7 @@ function ListMovie ({ movie: { id, title, year, rating, cover}, removeMovie}) {
                 </motion.div>
             </div>
             <Modal centered show={showModal} onHide={handleCloseModal}>
-                <Modal.Header closeButton>
+                <Modal.Header closeButton>w
                     <Modal.Title>Remove Movie</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>Are you sure you want to remove this movie from your list?</Modal.Body>

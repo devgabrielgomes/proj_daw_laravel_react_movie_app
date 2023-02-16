@@ -26,11 +26,16 @@ Route::group(['namespace' => 'App\Http\Controllers\V1'], function() {
     Route::get('my_list_items', [App\Http\Controllers\V1\MylistitemController::class, 'getListItems']);
     Route::get('get_list_movies', [App\Http\Controllers\V1\MylistitemController::class, 'getListMovies']);
 
-
     Route::post('my_list_items/add_movie', [App\Http\Controllers\V1\MylistitemController::class, 'addMyListItem']);
-    Route::delete('my_list_items/remove_movie/{id}', [App\Http\Controllers\V1\MylistitemController::class, 'deleteMyListItem']);
-
     Route::post('movies/add_movie', [App\Http\Controllers\V1\MovieController::class, 'addMovie']);
+
+    Route::post('movie_images/add_images', [App\Http\Controllers\V1\MovieimageController::class, 'addImages']);
+
+
+    Route::delete('my_list_items/remove_movie/{id}', [App\Http\Controllers\V1\MylistitemController::class, 'removeMyListItem']);
+    Route::delete('movies/remove_movie/{id}', [App\Http\Controllers\V1\MovieController::class, 'removeMovie']);
+
+
 
 
     //Route::apiResource('movies', MovieController::class);

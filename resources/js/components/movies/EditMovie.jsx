@@ -12,28 +12,31 @@ import {parseInt} from "lodash";
 import {forIn} from "lodash/object";
 
 function EditMovie() {
+    const navigate = useNavigate()
     let params = useParams();
     let id = params.id
-    const MOVIE_API = `http://127.0.0.1:8000/api/movies`
-    const MOVIE_GENRE_API = `http://127.0.0.1:8000/api/movie_genres/`
-    const GENRE_API = `http://127.0.0.1:8000/api/genres/`
-    const ROLE_API = `http://127.0.0.1:8000/api/roles`
-    const [movieInfo, setMovieInfo] = useState({})
-    const navigate = useNavigate()
+    const MOVIE_API = `http://localhost:8000/api/movies`
+    const MOVIE_GENRE_API = `http://localhost:8000/api/movie_genres/`
+    const GENRE_API = `http://localhost:8000/api/genres/`
+    const ROLE_API = `http://localhost:8000/api/roles`
+
     const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [synopsis, setSynopsis] = useState("");
     const [year, setYear] = useState("");
     const [rating, setRating] = useState("");
     const [genres, setGenres] = useState("");
-    const [movieGenres, setMovieGenres] = useState("");
+    const [allGenres, setAllGenres] = useState("");
+    const [allActors, setAllActors] = useState("");
+    const [allRoles, setAllRoles] = useState("");
     const [runtime, setRuntime] = useState("");
-    const [movieActors, setMovieActors] = useState("");
-    const [actorsRoles, setActorsRoles] = useState("");
+    const [actors, setActors] = useState("");
+    const [roles, setRoles] = useState("");
     const [trailer, setTrailer] = useState("");
-    const [poster, setPoster] = useState();
-    const [posterImage, setPosterImage] = useState("");
+
+    const [cover, setCover] = useState();
+    const [coverImage, setCoverImage] = useState();
     const [background, setBackground] = useState();
-    const [backgroundImage, setBackgroundImage] = useState("");
+    const [backgroundImage, setBackgroundImage] = useState();
 
 
     useEffect(() => {
@@ -44,16 +47,16 @@ function EditMovie() {
     }, [])
 
     useEffect(() => {
-            if (poster) {
+            if (cover) {
                 const reader = new FileReader();
                 reader.onloadend = () => {
-                    setPosterImage(reader.result);
+                    setCoverImage(reader.result);
                 };
-                reader.readAsDataURL(poster);
+                reader.readAsDataURL(cover);
             } else {
-                setPosterImage(null);
+                setCoverImage(null);
             }
-        }, [poster]);
+        }, [cover]);
 
     useEffect(() => {
         if (background) {
@@ -74,14 +77,13 @@ function EditMovie() {
             .then(data => {
                 console.log("data[id]:")
                 console.log(data[id - 1])
-                setMovieInfo(data[id - 1])
-                setYear(data[id - 1].year)
                 setTitle(data[id - 1].title)
-                setDescription(data[id - 1].synopsis)
+                setYear(data[id - 1].year)
+                setSynopsis(data[id - 1].synopsis)
                 setRating(data[id - 1].rating)
                 setRuntime(data[id - 1].runtime)
                 setTrailer(data[id - 1].trailer)
-                setPosterImage(data[id - 1].cover)
+                setCoverImage(data[id - 1].cover)
                 setBackgroundImage(data[id - 1].background)
             })
     }
@@ -97,7 +99,7 @@ function EditMovie() {
                 }
                 console.log("all_genres:")
                 console.log(all_genres)
-                setGenres(all_genres)
+                setAllGenres(all_genres)
             })
     }
 
@@ -116,7 +118,7 @@ function EditMovie() {
 
                 console.log("movie_genres:")
                 console.log(movie_genres)
-                setMovieGenres(movie_genres)
+                setGenres(movie_genres)
             })
     }
 
@@ -133,8 +135,8 @@ function EditMovie() {
                         actor_pic.push(data[i].actorPhoto)
                     }
                 }
-                setMovieActors(actors_name)
-                setActorsRoles(movie_roles)
+                setActors(actors_name)
+                setRoles(movie_roles)
                 //setActorsImage(actor_pic)
 
             })
@@ -142,29 +144,29 @@ function EditMovie() {
 
 
 
-    function onPosterChange() {
-        var newPoster = document.getElementById("new-poster").value;
-        console.log("newPoster: ", newPoster)
+    function onCoverChange() {
+        var newCover = document.getElementById("new-cover").value;
+        console.log("newCover: ", newCover)
     }
 
-    const createMovie = async (e) => {
+    const editMovie = async (e) => {
         e.preventDefault()
         const formData = new FormData()
         formData.append('title', title)
         formData.append('year', year)
-        formData.append('description', description)
+        formData.append('synopsis', synopsis)
         formData.append('rating', rating)
         formData.append('genres', genres)
         formData.append('runtime', runtime)
         formData.append('actors', actors)
         formData.append('actorsRoles', actorsRoles)
         formData.append('trailer', trailer)
-        formData.append('posterImage', posterImage)
+        formData.append('coverImage', coverImage)
         formData.append('backgroundImage', backgroundImage)
 
-        await axios.post("/api/add_movie/", formData)
+        await axios.post("/api/edit_movie/", formData)
             .then(({data}) => {
-                toast.success(`Movie added successfully!`, {
+                toast.success(`Movie edited successfully!`, {
                     position: "top-right",
                     autoClose: 5000,
                     hideProgressBar: false,
@@ -174,14 +176,13 @@ function EditMovie() {
                     progress: undefined,
                     theme: "dark",
                 })
-                navigate("/")
+                navigate("/management")
             })
             .catch(({response})=>{
 
             })
     }
 
-    let test;
     return (
         <>
             <NavbarComponent />
@@ -193,136 +194,135 @@ function EditMovie() {
                 </Link>
                 <h2 className="page-title">Edit Movie</h2>
                 <Form>
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Title:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={title} onChange={(event)=>{setTitle(event.target.value)}} placeholder="" />
-                        </Col>
-                    </Form.Group>
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
-                        <Form.Label column sm="3">
-                            Movie Description:
-                        </Form.Label>
-                        <Col sm="9">
-                            <Form.Control as="textarea" value={description} onChange={(event)=>{setDescription(event.target.value)}} rows={5} placeholder="" />
+                            <Form.Control type="text" value={title} onChange={(event)=>{setTitle(event.target.value)}}/>
                         </Col>
                     </Form.Group>
 
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm="3">
+                            Synopsis:
+                        </Form.Label>
+                        <Col sm="9">
+                            <Form.Control as="textarea" value={synopsis} onChange={(event)=>{setSynopsis(event.target.value)}} rows={3} />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Year:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={year} onChange={(event)=>{setYear(event.target.value)}} placeholder="" />
+                            <Form.Control type="text" value={year} onChange={(event)=>{setYear(event.target.value)}}/>
                         </Col>
                     </Form.Group>
 
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             IMDB Rating:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={rating} onChange={(event)=>{setRating(event.target.value)}} placeholder="" />
+                            <Form.Control type="text" value={rating} onChange={(event)=>{setRating(event.target.value)}}/>
                         </Col>
                     </Form.Group>
 
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Genres:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={movieGenres} onChange={(event)=>{setMovieGenres(event.target.value)}} placeholder="" />
+                            <Form.Control type="text" value={genres} onChange={(event)=>{setGenres(event.target.value)}}/>
                         </Col>
                     </Form.Group>
 
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Select the new movie genres while pressing "Ctrl" button:
                         </Form.Label>
                         <Col sm="9">
                             <select multiple className="form-control" id="exampleFormControlSelect2">
-                                {genres.length > 0 && genres.map(genre => (
+                                {allGenres.length > 0 && allGenres.map(genre => (
                                     <option id={genre}>{genre}</option>
                                 ))}
                             </select>
                         </Col>
                     </Form.Group>
 
-
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Runtime:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={runtime} onChange={(event)=>{setRuntime(event.target.value)}} placeholder="" />
+                            <Form.Control type="text" value={runtime} onChange={(event)=>{setRuntime(event.target.value)}}/>
                         </Col>
                     </Form.Group>
 
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Main Actors:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={movieActors} onChange={(event)=>{setActors(event.target.value)}} />
+                            <Form.Control as="textarea" value={actors} onChange={(event)=>{setActors(event.target.value)}} rows={3} />
                         </Col>
                     </Form.Group>
 
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Main Actors Roles:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={actorsRoles} onChange={(event)=>{setActorsRoles(event.target.value)}}/>
+                            <Form.Control as="textarea" value={roles} onChange={(event)=>{setActorsRoles(event.target.value)}} rows={3} />
                         </Col>
                     </Form.Group>
 
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Trailer ID:
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={trailer} onChange={(event)=>{setTrailer(event.target.value)}} placeholder=""/>
+                            <Form.Control as="textarea" value={trailer} onChange={(event)=>{setTrailer(event.target.value)}} rows={1} />
                         </Col>
-
                     </Form.Group>
 
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
-                            Poster:
+                            Cover:
                         </Form.Label>
                         <Col sm="7">
-                            <Form.Group controlId="formFile" className="mb-3">
-                                <Form.Label>Choose the movie poster.</Form.Label>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Choose the movie cover.</Form.Label>
                                 <Form.Control
                                     type="file"
-                                    id="new-poster"
+                                    id="new-cover"
                                     accept="image/*"
                                     onChange={(event) => {
                                     const file = event.target.files[0];
                                     if (file && file.type.substring(0,5) === "image") {
-                                        setPoster(file);
+                                        setCover(file);
                                     } else {
-                                        setPoster(null);
+                                        setCover(null);
                                     }
                                 }
                                 } />
                             </Form.Group>
                         </Col>
                         <Col sm="2">
-                            <img className="movie-poster" src={`/uploads/movie_images/cover/${posterImage}`} alt="movie-pos" className="img-thumbnail"></img>
+                            <img className="movie-cover" src={`/uploads/movie_images/cover/${coverImage}`} alt="movie-pos" className="img-thumbnail"></img>
                         </Col>
                     </Form.Group>
 
 
 
-                    <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
+                    <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Background:
                         </Form.Label>
                         <Col sm="7">
-                            <Form.Group controlId="formFile" className="mb-3">
+                            <Form.Group className="mb-3">
                                 <Form.Label>Choose the movie background.</Form.Label>
                                 <Form.Control
                                     type="file"
