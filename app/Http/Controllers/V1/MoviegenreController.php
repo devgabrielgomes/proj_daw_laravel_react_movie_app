@@ -42,6 +42,24 @@ class MoviegenreController extends Controller
 
         return $result;
     }
+
+    public function addMovieGenre(Request $request)
+    {
+        $id = $request->id;
+        $fk_id_movie = $request->fk_id_movie;
+        $movie_genres = $request->genres;
+
+        for($i=0; $i<count($movie_genres); $i++){
+            $datasave = [
+                'id' => $id + $i,
+                'fk_id_movie' => $fk_id_movie,
+                'fk_id_genre' => $movie_genres[$i],
+            ];
+            DB::table('movie_genres')->insert($datasave);
+        }
+    }
+
+
     /**
      * Store a newly created resource in storage.
      *

@@ -27,6 +27,7 @@ function MovieInfo() {
     const [actorsInMovie, setActorsInMovie] = useState([])
     const [movieActorsPhoto, setMovieActorsPhoto] = useState([])
     const [moviesInList, setMoviesInList] = useState([])
+    const [nextListMovieId, setNextListMovieId] = useState("")
 
     const [playTrailer, setPlayerTrailer] = useState(false)
 
@@ -46,6 +47,8 @@ function MovieInfo() {
         await fetch(ROLE_API)
             .then(res => res.json())
             .then(data => {
+                console.log("data role api:")
+                console.log(data)
                 var actors_name = [], movie_roles = [], actor_pic = [];
                 for (let i = 0; i < data.length; i++) {
                     if (data[i].idMovie == parseInt(id)) {
@@ -82,7 +85,7 @@ function MovieInfo() {
                         moviePossibleGenres.push(data[i].name)
                     }
                 }
-                console.log(moviePossibleGenres)
+                // console.log(moviePossibleGenres)
                 setGenresData(moviePossibleGenres)
             })
     }
@@ -92,15 +95,14 @@ function MovieInfo() {
         await fetch(LIST_ITEMS_API)
             .then(res => res.json())
             .then(data => {
-                console.log("listdata:")
-                console.log(data)
+                setNextListMovieId(data.length + 1);
+                // console.log("listdata:")
+                // console.log(data)
                 setMoviesInList(data)
             })
     }
 
     var hoursAndMinutes = parseInt(movieInfo.runtime / 60) + "h " + movieInfo.runtime % 60 + "m"
-
-
 
     let trailer_key = "";
     try {
@@ -136,8 +138,8 @@ function MovieInfo() {
     }
 
     //Add Movie to List
-    function addMovieToList(movie_id) {
-        const data = { "fk_id_movie": movie_id, "fk_id_my_list": 1 };
+    function addMovieToList(movie_id, nextListMovieId) {
+        const data = { "id": nextListMovieId, "fk_id_movie": movie_id, "fk_id_my_list": 1 };
 
         fetch(ADD_LIST_API, {
             method: 'POST',
@@ -162,10 +164,8 @@ function MovieInfo() {
             })
     }
 
-
     function buttonAddMovieClick() {
-        addMovieToList(id)
-        setShow(true)
+        addMovieToList(id, nextListMovieId)
     }
 
     return (

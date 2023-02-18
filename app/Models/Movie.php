@@ -11,6 +11,7 @@ class Movie extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'id',
         'title',
         'year',
         'rating',
@@ -19,8 +20,12 @@ class Movie extends Model
         'runtime',
     ];
 
+//    public function movieRoles() {
+//        return $this->hasOne(Movierole::class);
+//    }
+
     public function roles() {
-        return $this->hasMany(Role::class);
+        return $this->hasMany(Movierole::class);
     }
 
     public function movieGenres() {
@@ -32,7 +37,7 @@ class Movie extends Model
     }
 
     public function movieImages() {
-        return $this->hasMany(Movieimage::class);
+        return $this->hasOne(Movieimage::class);
     }
 }
 

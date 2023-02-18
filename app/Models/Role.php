@@ -10,8 +10,15 @@ class Role extends Model
     use HasFactory;
     public $timestamps = false;
 
-    public function movies() {
-        return $this->belongsTo(Movie::class);
+    protected $fillable = [
+        'id',
+        'fk_id_movie',
+        'fk_id_actor',
+        'name',
+    ];
+
+    public function movie() {
+        return $this->hasOne(Movierole::class);
     }
 
     public function actors() {

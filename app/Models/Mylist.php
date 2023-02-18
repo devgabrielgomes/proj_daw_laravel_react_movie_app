@@ -11,6 +11,11 @@ class Mylist extends Model
     use HasFactory;
     public $timestamps = false;
 
+    protected $fillable = [
+        'id',
+        'fk_id_user',
+    ];
+
     public function users() {
         return $this->hasOne(User::class);
     }

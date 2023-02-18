@@ -31,6 +31,13 @@ class GenreController extends Controller
         }
     }
 
+    public function addGenre(Request $request)
+    {
+        $genre = new Genre();
+        $genre->id = $request->id;
+        $genre->name = $request->name;
+        $genre->save();
+    }
 
     /**
      * Store a newly created resource in storage.

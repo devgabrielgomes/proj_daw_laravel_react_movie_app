@@ -14,11 +14,6 @@
     color: white;
 }
 
-.add-movie-btn {
-    float: right;
-    margin-bottom: 15px;
-}
-
 .number-th {
     width: 3%;
     text-align: center;
@@ -59,5 +54,16 @@
     text-align: center;
     vertical-align: middle;
     font-weight: bold;
+}
+
+.add-actor-or-genre-button {
+    float: right;
+    margin-right: 20px;
+    font-weight: bold;
+}
+
+.add-movie-btn {
+    float: right;
+    margin-bottom: 15px;
 }
 

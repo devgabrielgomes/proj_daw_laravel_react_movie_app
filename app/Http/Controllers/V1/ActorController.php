@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Filters\V1\ActorFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreActorRequest;
 use App\Http\Requests\UpdateActorRequest;
 use App\Http\Resources\V1\ActorCollection;
 use App\Http\Resources\V1\ActorResource;
 use App\Models\Actor;
+use Illuminate\Http\Request;
 
 class ActorController extends Controller
 {
@@ -16,9 +18,25 @@ class ActorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return new ActorCollection(Actor::all());
+        $filter = new ActorFilter();
+        $filterItems = $filter->transform($request); //[['column', 'operator', 'value']]
+        if(count($filterItems) == 0) {
+            return new ActorCollection(Actor::all());
+        } else {
+            $actors = Actor::where($filterItems)->paginate();
+
+            return new ActorCollection($actors->appends($request->query()));
+        }
+    }
+
+    public function addActor(Request $request)
+    {
+        $actor = new Actor();
+        $actor->id = $request->id;
+        $actor->name = $request->name;
+        $actor->save();
     }
 
     /**

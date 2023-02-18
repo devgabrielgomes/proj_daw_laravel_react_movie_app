@@ -34,25 +34,25 @@ class MovieimageController extends Controller
     public function addImages(Request $request) {
         $movie_image = new Movieimage();
 
-        $fk_id_movie = $request->fk_id_movie;
+        $fk_id_movie = $request->input('fk_id_movie');
         $movie_image->fk_id_movie = $fk_id_movie;
-        if($request->cover != "" && $request->background != "") {
+        if($request->hasFile('cover') && $request->hasFile('background')) {
             $img_cover = $request->file('cover');
             $img_background = $request->file('background');
-            $extension_cover = $img_cover->getClientOriginalExtension();
+            $extension_cover    = $img_cover->getClientOriginalExtension();
             $extension_background = $img_background->getClientOriginalExtension();
 
-            $file_name_cover = "cover_movie_".$fk_id_movie.".".$extension_cover;
-            $file_name_background = "background_movie_".$fk_id_movie.".".$extension_background;
+            $filename_cover = "cover_movie_".$fk_id_movie.".".$extension_cover;
+            $filename_background = "background_movie_".$fk_id_movie.".".$extension_background;
 
-            $upload_path_cover = "/uploads/movie_images/cover/";
-            $upload_path_background = "/uploads/movie_images/background/";
+            $upload_path_cover = "uploads/movie_images/cover/";
+            $upload_path_background = "uploads/movie_images/background/";
 
-            $img_cover->move($upload_path_cover, $file_name_cover);
-            $img_background->move($upload_path_background, $file_name_background);
+            $img_cover->move($upload_path_cover, $filename_cover);
+            $img_background->move($upload_path_background, $filename_background);
 
-            $movie_image->cover = $file_name_cover;
-            $movie_image->background = $file_name_background;
+            $movie_image->cover = $filename_cover;
+            $movie_image->background = $filename_background;
         } else {
             $movie_image->cover = "cover.jpg";
             $movie_image->background = "background.jpg";
@@ -60,6 +60,7 @@ class MovieimageController extends Controller
 //        $movie_image->cover = $file_name_cover;
 //        $movie_image->background = $file_name_background;
         $movie_image->save();
+        return redirect()->back();
     }
 
     /**

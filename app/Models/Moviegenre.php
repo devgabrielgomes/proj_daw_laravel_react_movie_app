@@ -10,6 +10,13 @@ class Moviegenre extends Model
     protected $table='movie_genres';
     public $timestamps = false;
 
+    protected $fillable = [
+        'id',
+        'fk_id_movie',
+        'fk_id_genre',
+    ];
+
+
     use HasFactory;
     public function movies() {
         return $this->belongsTo(Movie::class);

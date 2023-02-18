@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import NavbarComponent from "../NavbarComponent";
 import {Button, Form, Row, Col} from "react-bootstrap";
-import "../../../css/Change.css";
+import "../../../css/EditMovie.css";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {read} from "@popperjs/core";
 import { motion } from "framer-motion";

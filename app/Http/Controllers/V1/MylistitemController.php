@@ -47,6 +47,7 @@ class MylistitemController extends Controller
     public function addMyListItem(Request $request) {
         $my_list_item = new Mylistitem();
 
+        $my_list_item->id = $request->id;
         $my_list_item->fk_id_movie = $request->fk_id_movie;
         $my_list_item->fk_id_my_list = $request->fk_id_my_list;
         $my_list_item->save();

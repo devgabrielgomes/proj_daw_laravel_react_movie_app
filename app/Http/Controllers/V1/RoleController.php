@@ -43,6 +43,23 @@ class RoleController extends Controller
         return $result;
     }
 
+    public function addRoles(Request $request)
+    {
+        $id = $request->id;
+        $fk_id_movie = $request->fk_id_movie;
+        $actors = $request->actors;
+        $roles = $request->roles;
+
+        for($i=0; $i<count($actors); $i++){
+            $datasave = [
+                'id' => $id + $i,
+                'fk_id_movie' => $fk_id_movie,
+                'fk_id_actor' => $actors[$i],
+                'name' => $roles[$i],
+            ];
+            DB::table('roles')->insert($datasave);
+        }
+    }
 
     /**
      * Store a newly created resource in storage.

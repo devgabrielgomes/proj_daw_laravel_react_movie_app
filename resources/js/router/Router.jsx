@@ -10,6 +10,7 @@ import EditMovie from "../components/movies/EditMovie.jsx";
 import AddMovie from "../components/movies/AddMovie.jsx";
 import NotFound from "../components/NotFound";
 import Management from "../components/movies/Management";
+import AddActorOrGenre from "../components/movies/AddActorOrGenre";
 
 function Router() {
     const location = useLocation();
@@ -23,6 +24,7 @@ function Router() {
                     <Route path="/management" element={<Management />} />
                     <Route path="/management/add_movie" element={<AddMovie />} />
                     <Route path="/management/edit_movie/:id" element={<EditMovie />} />
+                    <Route path="/management/add_actor_or_genre" element={<AddActorOrGenre />} />
                     <Route path="/*" element={<NotFound />} />
                 </Routes>
             </AnimatePresence>

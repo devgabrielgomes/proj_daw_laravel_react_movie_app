@@ -10,7 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 //const FEATURED_API = `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=3bf31c72f99e4189266c43358ac6e189&page=1`
 const FEATURED_API = `http://localhost:8000/api/movies`
-//const SEARCH_API = `https://api.themoviedb.org/3/search/movie?api_key=3bf31c72f99e4189266c43358ac6e189&language=en-US&page=1&include_adult=false&query=`
+const SEARCH_API = `http://localhost:8000/api/search/`
 
 const Home = () => {
     const [movies, setMovies] = useState([])
@@ -24,6 +24,7 @@ const Home = () => {
         await fetch(API)
             .then(res => res.json())
             .then(data => {
+                console.log(data)
                 if (data.length > 0) {
                     console.log("movies:")
                     console.log(data)
@@ -46,13 +47,19 @@ const Home = () => {
     const handleOnSubmit = (e) => {
         e.preventDefault()
         if (searchTerm) {
+            console.log("getMovies(SEARCH_API + searchTerm):")
+            console.log(SEARCH_API + searchTerm)
             getMovies(SEARCH_API + searchTerm)
-            setSearchTerm("")
+
         }
     }
 
     const handleOnChange = (e) => {
         setSearchTerm(e.target.value)
+        console.log(e.target.value)
+        if(e.target.value == "") {
+            getMovies(FEATURED_API)
+        }
     }
 
     return (
@@ -67,6 +74,7 @@ const Home = () => {
                 <div className="welcome--text">
                     <h1>Get all the information about movies.</h1>
                 </div>
+
 
                 <form className="search--bar" onSubmit={handleOnSubmit}>
                     <input

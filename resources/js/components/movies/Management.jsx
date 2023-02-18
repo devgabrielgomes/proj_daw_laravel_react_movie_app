@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import NavbarComponent from "@/components/NavbarComponent";
-import {Button, Table} from "react-bootstrap";
+import {Button, Table, Row, Col} from "react-bootstrap";
 import "../../../css/Management.css";
 import {Link} from "react-router-dom";
 import { motion } from "framer-motion";
@@ -62,12 +62,25 @@ function Management() {
             <NavbarComponent />
             <div className="table-container">
                 <h2 className="page-title">Management</h2>
-                <b className="number-movies">Current number of movies in website: {movies.length}</b>
-                <Link to="/management/add_movie">
-                    <Button className="add-movie-btn" variant="success">
-                        <i className="fas fa-plus"></i> Add new movie
-                    </Button>{' '}
-                </Link>
+                <Row>
+                    <Col sm="5">
+                        <b className="number-movies">Current number of movies in website: {movies.length}</b>
+                    </Col>
+                    <Col sm="7">
+                        <Link to="/management/add_movie">
+                            <Button className="add-movie-btn" variant="success">
+                                <i className="fas fa-plus"></i> Add new movie
+                            </Button>{' '}
+                        </Link>
+                        <Link to="/management/add_actor_or_genre">
+                            <Button className="add-actor-or-genre-button" variant="secondary">
+                                <i className="fas fa-plus"></i> Add actor or genre
+                            </Button>{' '}
+                        </Link>
+                    </Col>
+                </Row>
+
+
                 <Table className="table" striped bordered hover variant="dark">
                     <thead>
                     <tr>

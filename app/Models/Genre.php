@@ -10,6 +10,11 @@ class Genre extends Model
     use HasFactory;
     public $timestamps = false;
 
+    protected $fillable = [
+        'id',
+        'name'
+    ];
+
     public function movieGenres() {
         return $this->hasOne(Moviegenre::class);
     }

@@ -26,7 +26,7 @@ class MovieController extends Controller
         $filter = new MovieFilter();
         $filterItems = $filter->transform($request); //[['column', 'operator', 'value']]
         if(count($filterItems) == 0) {
-            return new MovieCollection(Movie::paginate());
+            return new MovieCollection(Movie::all());
         } else {
             $movies = Movie::where($filterItems)->paginate();
 
@@ -50,6 +50,7 @@ class MovieController extends Controller
     {
         $movie = new Movie();
 
+        $movie->id = $request->id;
         $movie->title = $request->title;
         $movie->year = $request->year;
         $movie->rating = $request->rating;
@@ -64,6 +65,24 @@ class MovieController extends Controller
         $item = Movie::where('id', '=', $id);
         $item->delete();
     }
+
+    public function searchMovie($term)
+    {
+        $searchValues = preg_split('/\s+/', $term, -1, PREG_SPLIT_NO_EMPTY);
+        $final_term = "%";
+        if ($searchValues > 1) {
+            foreach ($searchValues as $elm) {
+                $final_term = $final_term.$elm."%";
+            }
+        } else {
+            $final_term = $term;
+        }
+        return Movie::where("title","like",$final_term)
+            ->join('movie_images', 'movie_images.fk_id_movie', '=', 'movies.id')
+                ->select('movies.*','movie_images.cover as cover', 'movie_images.background as background')
+                ->get();
+    }
+
 
     /**
      * Store a newly created resource in storage.

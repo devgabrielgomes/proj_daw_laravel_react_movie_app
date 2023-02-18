@@ -11,6 +11,13 @@ class Actorimage extends Model
     public $timestamps = false;
     use HasFactory;
 
+    protected $fillable = [
+        'id',
+        'fk_id_movie',
+        'cover',
+        'background'
+    ];
+
     public function actor() {
         return $this->hasOne(Actor::class);
     }
