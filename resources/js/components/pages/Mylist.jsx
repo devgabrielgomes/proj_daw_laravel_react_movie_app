@@ -100,8 +100,6 @@ function Mylist() {
                 <div className="title-mylist">
                     <h1>My list</h1>
                 </div>
-
-
                 {
                     listMovies.length > 0
                         ?

@@ -116,9 +116,8 @@ function MovieInfo() {
 
     /**
      * DELETE request to remove a specific movie from the list
-     * @param id
      */
-    function removeMovie(id) {
+    function removeMovie() {
         axios.delete(REMOVE_LIST_API + id)
             .then(() => {
                 getListData(LIST_ITEMS_API)
@@ -132,14 +131,12 @@ function MovieInfo() {
 
     /**
      * POST request to add a specific movie to the list
-     * @param movie_id
-     * @param nextListMovieId
      */
-    async function addMovieToList(movie_id, nextListMovieId) {
+    async function addMovieToList() {
         const addListFormData = new FormData()
         addListFormData.append('id', nextListMovieId)
-        addListFormData.append('fk_id_movie', movie_id)
-        addListFormData.append('fk_id_movie', 1)
+        addListFormData.append('fk_id_movie', id)
+        addListFormData.append('fk_id_my_list', 1)
 
         await axios.post(ADD_LIST_API, addListFormData)
             .then(() => {
@@ -237,7 +234,7 @@ function MovieInfo() {
                                         <motion.div
                                             whileTap={{ scale: 0.9 }}
                                         >
-                                            {<Button className="movie-list-button-option" variant="outline-success" id="btn-add-movie" onClick={() => addMovieToList(id, nextListMovieId)}>
+                                            {<Button className="movie-list-button-option" variant="outline-success" id="btn-add-movie" onClick={() => addMovieToList(id)}>
                                                 <i className="fas fa-folder-plus"></i>  Add to my list
                                             </Button>}
                                         </motion.div>

@@ -16,18 +16,22 @@ function EditMovie() {
     const GENRE_API = `http://localhost:8000/api/genres/`
     const ROLE_API = `http://localhost:8000/api/roles`
 
+
     const [title, setTitle] = useState("");
     const [synopsis, setSynopsis] = useState("");
     const [year, setYear] = useState("");
     const [rating, setRating] = useState("");
-    const [genres, setGenres] = useState("");
-    const [allGenres, setAllGenres] = useState("");
-    const [allActors, setAllActors] = useState("");
-    const [allRoles, setAllRoles] = useState("");
+
     const [runtime, setRuntime] = useState("");
-    const [actors, setActors] = useState("");
-    const [roles, setRoles] = useState("");
     const [trailer, setTrailer] = useState("");
+
+
+    const [allGenres, setAllGenres] = useState([]);
+    const [allActors, setAllActors] = useState([]);
+    const [rolesText, setText] = useState("");
+    const [genres, setSelectedOptionsGenres] = useState([]);
+    const [actors, setSelectedOptionsActors] = useState([]);
+    const [roles, setRoles] = useState([]);
 
     const [cover, setCover] = useState();
     const [coverImage, setCoverImage] = useState();
@@ -39,6 +43,7 @@ function EditMovie() {
         getGenresData(GENRE_API)
         getMovieGenresData(MOVIE_GENRE_API)
         getRolesData(ROLE_API)
+        getMovieRolesData(ROLE_API)
     }, [])
 
     useEffect(() => {
@@ -98,11 +103,30 @@ function EditMovie() {
             .then(data => {
                 let all_genres = [];
                 for (let i = 0; i < data.data.length; i++) {
-                    all_genres[i] = data.data[i].name
+                    all_genres[i] = data.data[i].id + " - " + data.data[i].name
                 }
-                console.log("all_genres:")
-                console.log(all_genres)
                 setAllGenres(all_genres)
+            })
+    }
+
+    /**
+     * GET request to set roles data
+     * @async
+     * @param ROLE_API
+     * @returns {Promise<void>}
+     */
+    async function getRolesData(ROLE_API) {
+        await fetch(ROLE_API)
+            .then(res => res.json())
+            .then(data => {
+                var actors_name = [], movie_roles = [], actor_pic = [];
+                for (let i = 0; i < data.length; i++) {
+                    actors_name.push(data[i].id + " - " + data[i].actorName)
+                    movie_roles.push(data[i].id + " - " + data[i].roleName)
+                    actor_pic.push(data[i].actorPhoto)
+                }
+                setAllActors(actors_name)
+                // setAllActorsPhotos(actor_pic)
             })
     }
 
@@ -117,38 +141,43 @@ function EditMovie() {
             .then(res => res.json())
             .then(data => {
                 let movie_genres = [];
-
                 for (let i = 0; i < data.length; i++) {
                     if (data[i].idMovie == id) {
                         movie_genres.push(data[i].name)
                     }
                 }
-
-                console.log("movie_genres:")
-                console.log(movie_genres)
-                setGenres(movie_genres)
+                setSelectedOptionsGenres(movie_genres)
             })
     }
 
-    //Get roles data
-    async function getRolesData(ROLE_API) {
+    /**
+     * GET request to set movie roles data
+     * @async
+     * @param ROLE_API
+     * @returns {Promise<void>}
+     */
+    async function getMovieRolesData(ROLE_API) {
         await fetch(ROLE_API)
             .then(res => res.json())
             .then(data => {
-                var actors_name = [], movie_roles = [], actor_pic = [];
+                let movie_actors = [], movie_roles = [], actor_pic = [];
                 for (let i = 0; i < data.length; i++) {
-                    if (data[i].idMovie == parseInt(id)) {
-                        actors_name.push(data[i].actorName)
+                    if (data[i].idMovie === id) {
+                        movie_actors.push(data[i].actorName)
                         movie_roles.push(data[i].roleName)
                         actor_pic.push(data[i].actorPhoto)
                     }
                 }
-                setActors(actors_name)
-                setRoles(movie_roles)
-                //setActorsImage(actor_pic)
 
+                console.log("movie_actors:")
+                console.log(movie_actors)
+                console.log("movie_roles:")
+                console.log(movie_roles)
+                setSelectedOptionsActors(movie_actors)
+                setSelectedOptionsRoles(movie_roles)
             })
     }
+
 
     //
     // function onCoverChange() {
@@ -168,26 +197,87 @@ function EditMovie() {
         formData.append('actors', actors)
         formData.append('actorsRoles', actorsRoles)
         formData.append('trailer', trailer)
-        formData.append('coverImage', coverImage)
-        formData.append('backgroundImage', backgroundImage)
 
         await axios.post("/api/edit_movie/", formData)
-            .then(({data}) => {
-                toast.success(`Movie edited successfully!`, {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                })
+            .then(() => {
+                toastSuccess(`Movie edited successfully!`)
+                wait(3500)
                 navigate("/management")
             })
             .catch(({response})=>{
-
+                toastError(`Unable to edit movie! Check the parameters.`)
             })
+    }
+
+    /**
+     * Handle the genres changes
+     * @param e
+     */
+    const changeHandlerGenres = (e) => {
+        let selected_genres = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+        console.log(selected_genres)
+        setSelectedOptionsGenres(selected_genres);
+    }
+
+    /**
+     * Handle the actors changes
+     * @param e
+     */
+    const changeHandlerActors = (e) => {
+        let selected_actors = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+        setSelectedOptionsActors(selected_actors);
+    }
+
+    /**
+     * Handle the roles changes
+     * @param e
+     */
+    const changeHandlerRoles = (e) => {
+        let selected_roles = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+        setSelectedOptionsRoles(selected_roles);
+    }
+
+    /**
+     * Stop the execution for a certain amount of time
+     * @param ms
+     * @returns {Promise<unknown>}
+     */
+    function wait(ms) {
+        return new Promise( (resolve) => {setTimeout(resolve, ms)});
+    }
+
+    /**
+     * Display a success toast with a specific message
+     * @param message
+     */
+    function toastSuccess(message) {
+        toast.success(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
+    }
+
+    /**
+     * Display an error toast with a specific message
+     * @param message
+     */
+    function toastError(message) {
+        toast.error(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
     }
 
     return (
@@ -239,21 +329,13 @@ function EditMovie() {
 
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
-                            Genres:
+                            Select the movie genres while pressing "Ctrl" button:<br></br>
+                            Current movie genres IDs by order -> <b>{genres.join(', ')}</b>
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={genres} onChange={(event)=>{setGenres(event.target.value)}}/>
-                        </Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="3">
-                            Select the new movie genres while pressing "Ctrl" button:
-                        </Form.Label>
-                        <Col sm="9">
-                            <select multiple className="form-control" id="exampleFormControlSelect2">
+                            <select name="selectOptions" multiple={true} onChange={changeHandlerGenres} id="multiple-selector">
                                 {allGenres.length > 0 && allGenres.map(genre => (
-                                    <option id={genre}>{genre}</option>
+                                    <option value={genre} id={genre}>{genre}</option>
                                 ))}
                             </select>
                         </Col>
@@ -270,19 +352,24 @@ function EditMovie() {
 
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
-                            Main Actors:
+                            Select four movie main actors while pressing "Ctrl" button:<br></br>
+                            Current movie actors IDs by order -> <b>{actors.join(', ')}</b>
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control as="textarea" value={actors} onChange={(event)=>{setActors(event.target.value)}} rows={3} />
+                            <select name="selectOptions" multiple="true" onChange={changeHandlerActors} id="multiple-selector">
+                                {allActors.length > 0 && allActors.map(actor => (
+                                    <option value={actor} id={actor}>{actor}</option>
+                                ))}
+                            </select>
                         </Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
-                            Main Actors Roles:
+                            Current movie actors IDs by order -> <b>{roles.join(', ')}</b>
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control as="textarea" value={roles} onChange={(event)=>{setActorsRoles(event.target.value)}} rows={3} />
+                            <Form.Control type="text" value={year} onChange={(event)=>{setSelectedOptionsRoles(event.target.value)}}/>
                         </Col>
                     </Form.Group>
 

@@ -17,6 +17,15 @@ function AddMovie() {
     const ACTOR_API = `http://localhost:8000/api/actors`
     const ADD_GENRE_API = `http://localhost:8000/api/genres/add`
     const ADD_ACTOR_API = `http://localhost:8000/api/actors/add`
+    const ADD_ACTOR_IMAGE_API = `http://localhost:8000/api/actor_image/add`
+
+    const [actorPhoto, setactorPhoto] = useState({});
+    const uploadActorPhoto = (e) => {
+        setactorPhoto({
+            actorPhotoPreview : URL.createObjectURL(e.target.files[0]),
+            actorPhotoAsFile : e.target.files[0]
+        })
+    }
 
     useEffect(() => {
         getNextActorID(ACTOR_API)
@@ -37,12 +46,30 @@ function AddMovie() {
         await axios.post(ADD_ACTOR_API, actorFormData)
             .then(async () => {
                 toastSuccess(`Actor added successfully!`)
-                await wait(3500)
-                navigate("/management")
             })
             .catch(({response})=>{
                 toastError("Unable to add actor! Check actor parameters.")
             })
+
+        const actorPhotoFormData = new FormData()
+        actorPhotoFormData.append('id', nextActorID)
+        actorPhotoFormData.append('fk_id_actor', nextActorID)
+        actorPhotoFormData.append('photo', actorPhoto.actorPhotoAsFile)
+
+        await axios.post(ADD_ACTOR_IMAGE_API, actorPhotoFormData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        })
+            .then(() => {
+                toastSuccess(`Actor image added successfully!`)
+            })
+            .catch(({response})=>{
+                toastError(`Unable to add actor image! Check image parameters.`)
+            })
+
+        await wait(3500)
+        navigate("/management")
     }
 
     /**
@@ -154,6 +181,16 @@ function AddMovie() {
                         <h2 className="page-title">Add Actor or Genre</h2>
                     </Col>
                 </Row>
+
+                <Form.Group as={Row} className="mb-3">
+                    <Form.Label column sm="3">
+                        Genre name
+                    </Form.Label>
+                    <Col sm="9">
+                        <Form.Control type="text" value={genreName} onChange={(event)=>{setGenreName(event.target.value)}}  />
+                    </Col>
+                </Form.Group>
+
                 <Form.Group as={Row} className="mb-3">
                     <Form.Label column sm="3">
                         Actor name
@@ -165,10 +202,15 @@ function AddMovie() {
 
                 <Form.Group as={Row} className="mb-3">
                     <Form.Label column sm="3">
-                        Genre name
+                        Actor Photo:
                     </Form.Label>
-                    <Col sm="9">
-                        <Form.Control type="text" value={genreName} onChange={(event)=>{setGenreName(event.target.value)}}  />
+                    <Col sm="7">
+                        <Form.Group className="mb-3">
+                            <Form.Control type="file" name="cover" className="form-control" id="cover" onChange={uploadActorPhoto}/>
+                        </Form.Group>
+                    </Col>
+                    <Col sm="2">
+                        <img name="movie-cover" src={actorPhoto.actorPhotoPreview} alt="movie-pos" className="img-thumbnail"></img>
                     </Col>
                 </Form.Group>
 

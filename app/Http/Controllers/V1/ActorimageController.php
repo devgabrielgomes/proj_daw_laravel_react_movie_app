@@ -32,13 +32,25 @@ class ActorimageController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreActorimageRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return void
      */
-    public function store(StoreActorimageRequest $request)
+    public function store(Request $request)
     {
-        return new ActorimageResource(Actorimage::create($request->all()));
+        $actor_image = new Actorimage();
+
+        $actor_image->id = $request->id;
+        $actor_image->fk_id_actor = $request->fk_id_actor;
+        if($request->photo != "") {
+            $img = $request->file('photo');
+            $extension = $img->getClientOriginalExtension();
+            $filename = "actor_".$request->fk_id_actor.".".$extension;
+            $upload_path = "uploads/actor_images/";
+
+            $img->move($upload_path, $filename);
+            $actor_image->photo = $filename;
+        }
+        $actor_image->save();
     }
 
     /**

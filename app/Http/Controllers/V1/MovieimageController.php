@@ -43,7 +43,7 @@ class MovieimageController extends Controller
 
         $movie_image->id = $request->id;
         $movie_image->fk_id_movie = $request->fk_id_movie;
-        if($request->hasFile('cover') && $request->hasFile('background')) {
+        if($request->cover != "" && $request->background != "") {
             $img_cover = $request->file('cover');
             $img_background = $request->file('background');
             $extension_cover = $img_cover->getClientOriginalExtension();
@@ -60,14 +60,8 @@ class MovieimageController extends Controller
 
             $movie_image->cover = $filename_cover;
             $movie_image->background = $filename_background;
-        } else {
-            $movie_image->cover = "cover.jpg";
-            $movie_image->background = "background.jpg";
         }
-//        $movie_image->cover = $file_name_cover;
-//        $movie_image->background = $file_name_background;
         $movie_image->save();
-        //return redirect()->back();
     }
 
     /**
@@ -101,6 +95,18 @@ class MovieimageController extends Controller
      */
     public function destroy($id)
     {
+        $movie_image = Movieimage::findOrFail($id);
+        $cover_path = "uploads/movie_images/cover/";
+        $background_path = "uploads/movie_images/background/";
+
+        $cover_image = $cover_path.$movie_image->cover;
+        $background_image = $background_path.$movie_image->background;
+
+        if(file_exists($cover_image) && (file_exists($background_image))) {
+            @unlink($cover_image);
+            @unlink($background_image);
+        }
         Movieimage::where('fk_id_movie', '=', $id)->delete();
     }
+
 }

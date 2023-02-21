@@ -9,10 +9,10 @@ import {parseInt} from "lodash";
 
 function AddMovie() {
     const navigate = useNavigate()
-    const [nextMovieID, setNextMovieID] = useState("")
-    const [nextMovieGenreID, setNextMovieGenreID] = useState("")
-    const [nextRoleID, setNextRoleID] = useState("")
-    const [nextMovieImageID, setNextMovieImageID] = useState("")
+    const [nextMovieID, setNextMovieID] = useState()
+    const [nextMovieGenreID, setNextMovieGenreID] = useState()
+    const [nextRoleID, setNextRoleID] = useState()
+    const [nextMovieImageID, setNextMovieImageID] = useState()
     const [title, setTitle] = useState("");
     const [synopsis, setSynopsis] = useState("");
     const [year, setYear] = useState("");
@@ -20,65 +20,46 @@ function AddMovie() {
     const [allGenres, setAllGenres] = useState([]);
     const [allActors, setAllActors] = useState([]);
     const [selectedRoles, setSelectedRoles] = useState("");
-    const [allActorsPhotos, setAllActorsPhotos] = useState([]);
 
     const [runtime, setRuntime] = useState("");
-    const [actorsRoles, setActorsRoles] = useState("");
     const [trailer, setTrailer] = useState("");
-
-    const [cover, setCover] = useState();
-    const [background, setBackground] = useState();
-
     const [genres, setSelectedOptionsGenres] = useState([]);
     const [actors, setSelectedOptionsActors] = useState([]);
-    // const [actorsImages, setSelectedOptionsActorsImages] = useState([]);
-
-    // const [coverImage, setCoverImage] = useState();
-    // const [backgroundImage, setBackgroundImage] = useState();
     const MOVIE_API = `http://localhost:8000/api/movies`
     const GENRE_API = `http://localhost:8000/api/genres/`
     const MOVIE_GENRE_API = `http://localhost:8000/api/movie_genres`
     const ROLE_API = `http://localhost:8000/api/roles`
-    const MOVIE_IMAGES_API = `http://localhost:8000/api/movie_images`
+    const ACTOR_API = `http://localhost:8000/api/actors`
     const ADD_MOVIE_API = `http://localhost:8000/api/movies/add`
     const ADD_ROLES_API = "http://localhost:8000/api/roles/add"
     const ADD_MOVIE_GENRE_API = "http://localhost:8000/api/movie_genres/add"
     const ADD_MOVIE_IMAGES_API = "http://localhost:8000/api/movie_images/add/"
 
+    const [cover, setCover] = useState({});
+    const uploadCover = (e) => {
+        setCover({
+            coverPreview : URL.createObjectURL(e.target.files[0]),
+            coverAsFile : e.target.files[0]
+        })
+    }
+
+    const [background, setBackground] = useState({});
+    const uploadBackground = (e) => {
+        setBackground({
+            backgroundPreview : URL.createObjectURL(e.target.files[0]),
+            backgroundAsFile : e.target.files[0]
+        })
+    }
+
     useEffect(() => {
-        getNextMovieID(MOVIE_API)
         getGenresData(GENRE_API)
         getRolesData(ROLE_API)
         getNextMovieGenreID(MOVIE_GENRE_API)
         getNextRoleID(ROLE_API)
-        getNextImageID(MOVIE_IMAGES_API)
+        getNextMovieID(MOVIE_API)
+        getActorsData(ACTOR_API)
     }, [])
 
-    /**
-     * Handle the cover change
-     * @param e
-     */
-    const changeHandlerCover = (e) => {
-        let file = e.target.files[0]
-        let cover_reader = new FileReader()
-        cover_reader.onloadend = (file) => {
-            setCover(cover_reader.result)
-        }
-        cover_reader.readAsDataURL(file)
-    }
-
-    /**
-     * Handle the background change
-     * @param e
-     */
-    const changeHandlerBackground = (e) => {
-        let file = e.target.files[0]
-        let background_reader = new FileReader()
-        background_reader.onloadend = (file) => {
-            setBackground(background_reader.result)
-        }
-        background_reader.readAsDataURL(file)
-    }
 
     /**
      * Handle the genres changes
@@ -109,7 +90,7 @@ function AddMovie() {
         await postMovie()
         await postMovieGenres()
         await postMovieRoles()
-        //await postMovieImages()
+        await postMovieImages()
 
         await wait(3500)
         navigate("/management")
@@ -157,7 +138,7 @@ function AddMovie() {
 
         await axios.post(ADD_MOVIE_GENRE_API, movieGenresFormData)
             .then(() => {
-                toastError(`Movie genres added successfully!`)
+                toastSuccess(`Movie genres added successfully!`)
             })
             .catch(({response})=>{
                 toastError("Unable to add movie genres! Check movie parameters.")
@@ -199,12 +180,16 @@ function AddMovie() {
      */
     const postMovieImages = async (e) => {
         const movieImagesFormData = new FormData()
-        movieImagesFormData.append('id', nextMovieImageID)
+        movieImagesFormData.append('id', nextMovieID)
         movieImagesFormData.append('fk_id_movie', nextMovieID)
-        movieImagesFormData.append('cover', cover)
-        movieImagesFormData.append('background', background)
+        movieImagesFormData.append('cover', cover.coverAsFile)
+        movieImagesFormData.append('background', background.backgroundAsFile)
 
-        await axios.post(ADD_MOVIE_IMAGES_API, movieImagesFormData)
+        await axios.post(ADD_MOVIE_IMAGES_API, movieImagesFormData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        })
             .then(() => {
                 toastSuccess(`Images added successfully!`)
             })
@@ -223,6 +208,8 @@ function AddMovie() {
         await fetch(MOVIE_API)
             .then(res => res.json())
             .then(data => {
+                console.log("NextMovieID:")
+                console.log(data.length + 1)
                 setNextMovieID(data.length + 1)
             })
     }
@@ -256,20 +243,6 @@ function AddMovie() {
     }
 
     /**
-     * GET request to set next movie image ID
-     * @async
-     * @param MOVIE_IMAGES_API
-     * @returns {Promise<void>}
-     */
-    async function getNextImageID(MOVIE_IMAGES_API) {
-        await fetch(MOVIE_IMAGES_API)
-            .then(res => res.json())
-            .then(data => {
-                setNextMovieImageID(data.data.length + 1)
-            })
-    }
-
-    /**
      * GET request to set genres data
      * @async
      * @param GENRE_API
@@ -297,14 +270,30 @@ function AddMovie() {
         await fetch(ROLE_API)
             .then(res => res.json())
             .then(data => {
-                var actors_name = [], movie_roles = [], actor_pic = [];
+                var movie_roles = [], actor_pic = [];
                 for (let i = 0; i < data.length; i++) {
-                        actors_name.push(data[i].id + " - " + data[i].actorName)
                         movie_roles.push(data[i].id + " - " + data[i].roleName)
                         actor_pic.push(data[i].actorPhoto)
                 }
-                setAllActors(actors_name)
                 setAllActorsPhotos(actor_pic)
+            })
+    }
+
+    /**
+     * GET request to set actors data
+     * @async
+     * @param ACTOR_API
+     * @returns {Promise<void>}
+     */
+    async function getActorsData(ACTOR_API) {
+        await fetch(ACTOR_API)
+            .then(res => res.json())
+            .then(data => {
+                var actors_name = [];
+                for (let i = 0; i < data.data.length; i++) {
+                    actors_name.push(data.data[i].id + " - " + data.data[i].name)
+                }
+                setAllActors(actors_name)
             })
     }
 
@@ -351,31 +340,7 @@ function AddMovie() {
         });
     }
 
-    // // When a photo is selected the image appear
-    // useEffect(() => {
-    //     if (cover) {
-    //         const reader_cover = new FileReader();
-    //         reader_cover.onloadend = () => {
-    //             setCover(reader.result);
-    //         };
-    //         reader_cover.readAsDataURL(cover);
-    //     } else {
-    //         setCover(null);
-    //     }
-    // }, [cover]);
-    //
-    // // When a photo is selected the image appear
-    // useEffect(() => {
-    //     if (background) {
-    //         const reader_background = new FileReader();
-    //         reader_background.onloadend = () => {
-    //             setBackground(reader.result);
-    //         };
-    //         reader_background.readAsDataURL(background);
-    //     } else {
-    //         setBackground(null);
-    //     }
-    // }, [background]);
+
 
     return (
         <>
@@ -491,11 +456,11 @@ function AddMovie() {
                         </Form.Label>
                         <Col sm="7">
                             <Form.Group className="mb-3">
-                                <Form.Control type="file" name="cover" className="form-control" id="cover" onChange={changeHandlerCover}/>
+                                <Form.Control type="file" name="cover" className="form-control" id="cover" onChange={uploadCover}/>
                             </Form.Group>
                         </Col>
                         <Col sm="2">
-                            <img name="movie-cover" src={cover} alt="movie-pos" className="img-thumbnail"></img>
+                            <img name="movie-cover" src={cover.coverPreview} alt="movie-pos" className="img-thumbnail"></img>
                         </Col>
                     </Form.Group>
 
@@ -505,11 +470,11 @@ function AddMovie() {
                         </Form.Label>
                         <Col sm="7">
                             <Form.Group className="mb-3">
-                                <Form.Control type="file" name="background" className="form-control" id="background" onChange={changeHandlerBackground} />
+                                <Form.Control type="file" name="background" className="form-control" id="background" onChange={uploadBackground}/>
                             </Form.Group>
                         </Col>
                         <Col sm="2">
-                            <img name="movie-background" src={background} alt="movie-bkg" className="img-thumbnail"></img>
+                            <img name="movie-background" src={background.backgroundPreview} alt="movie-bkg" className="img-thumbnail"></img>
                         </Col>
                     </Form.Group>
 
