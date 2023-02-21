@@ -15,8 +15,8 @@ class MovieimageController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return MovieimageCollection
      */
     public function index(Request $request)
     {
@@ -31,19 +31,26 @@ class MovieimageController extends Controller
         }
     }
 
-    public function addImages(Request $request) {
+    /**
+     * Store a newly created resource in storage.
+     * @param Request $request
+     * @return void
+     */
+
+    public function store(Request $request)
+    {
         $movie_image = new Movieimage();
 
-        $fk_id_movie = $request->input('fk_id_movie');
-        $movie_image->fk_id_movie = $fk_id_movie;
+        $movie_image->id = $request->id;
+        $movie_image->fk_id_movie = $request->fk_id_movie;
         if($request->hasFile('cover') && $request->hasFile('background')) {
             $img_cover = $request->file('cover');
             $img_background = $request->file('background');
-            $extension_cover    = $img_cover->getClientOriginalExtension();
+            $extension_cover = $img_cover->getClientOriginalExtension();
             $extension_background = $img_background->getClientOriginalExtension();
 
-            $filename_cover = "cover_movie_".$fk_id_movie.".".$extension_cover;
-            $filename_background = "background_movie_".$fk_id_movie.".".$extension_background;
+            $filename_cover = "cover_movie_".$request->fk_id_movie.".".$extension_cover;
+            $filename_background = "background_movie_".$request->fk_id_movie.".".$extension_background;
 
             $upload_path_cover = "uploads/movie_images/cover/";
             $upload_path_background = "uploads/movie_images/background/";
@@ -60,18 +67,7 @@ class MovieimageController extends Controller
 //        $movie_image->cover = $file_name_cover;
 //        $movie_image->background = $file_name_background;
         $movie_image->save();
-        return redirect()->back();
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreMovieimageRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreMovieimageRequest $request)
-    {
-        return new MovieimageResource(Movieimage::create($request->all()));
+        //return redirect()->back();
     }
 
     /**
@@ -100,12 +96,11 @@ class MovieimageController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Movieimage  $movieimage
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return void
      */
-    public function destroy(Movieimage $movieimage)
+    public function destroy($id)
     {
-        //
+        Movieimage::where('fk_id_movie', '=', $id)->delete();
     }
 }

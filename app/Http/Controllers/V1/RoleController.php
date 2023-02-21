@@ -16,23 +16,10 @@ class RoleController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Support\Collection
      */
     public function index(Request $request)
-    {
-        $filter = new RoleFilter();
-        $filterItems = $filter->transform($request); //[['column', 'operator', 'value']]
-        if(count($filterItems) == 0) {
-            return new RoleCollection(Role::all());
-        } else {
-            $roles = Role::where($filterItems)->paginate();
-
-            return new RoleCollection($roles->appends($request->query()));
-        }
-    }
-
-    public function getRoles()
     {
         $result = DB::table('roles')
             ->join('actors', 'actors.id', '=', 'roles.fk_id_actor')
@@ -43,7 +30,12 @@ class RoleController extends Controller
         return $result;
     }
 
-    public function addRoles(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     * @param Request $request
+     * @return void
+     */
+    public function store(Request $request)
     {
         $id = $request->id;
         $fk_id_movie = $request->fk_id_movie;
@@ -59,17 +51,6 @@ class RoleController extends Controller
             ];
             DB::table('roles')->insert($datasave);
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreRoleRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreRoleRequest $request)
-    {
-        return new RoleResource(Role::create($request->all()));
     }
 
     /**
@@ -97,12 +78,11 @@ class RoleController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Role  $role
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return void
      */
-    public function destroy(Role $role)
+    public function destroy($id)
     {
-        //
+        Role::where('fk_id_movie', '=', $id)->delete();
     }
 }

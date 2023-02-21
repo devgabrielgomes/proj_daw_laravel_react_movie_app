@@ -20,30 +20,48 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 //Route::post('/add_movie', [MovieController::class, 'add_movie']);
 Route::group(['namespace' => 'App\Http\Controllers\V1'], function() {
-    Route::get('movies', [App\Http\Controllers\V1\MovieController::class, 'getMovies']);
-    Route::get('roles', [App\Http\Controllers\V1\RoleController::class, 'getRoles']);
-    Route::get('movie_genres', [App\Http\Controllers\V1\MoviegenreController::class, 'getMovieGenres']);
-    Route::get('my_list_items', [App\Http\Controllers\V1\MylistitemController::class, 'getListItems']);
-    Route::get('get_list_movies', [App\Http\Controllers\V1\MylistitemController::class, 'getListMovies']);
-    Route::get('search/{query}', [App\Http\Controllers\V1\MovieController::class, 'searchMovie']);
-    Route::get('actors', [App\Http\Controllers\V1\ActorController::class, 'index']);
+    //MOVIE REQUESTS
+    Route::get('movies', [App\Http\Controllers\V1\MovieController::class, 'index']);
+    Route::post('movies/add', [App\Http\Controllers\V1\MovieController::class, 'store']);
+    Route::get('movies/search/{term}', [App\Http\Controllers\V1\MovieController::class, 'show']);
+    Route::delete('movies/remove/{id}', [App\Http\Controllers\V1\MovieController::class, 'destroy']);
+
+    //MOVIE IMAGES REQUESTS
+    Route::get('movie_images', [App\Http\Controllers\V1\MovieimageController::class, 'index']);
+    Route::post('movie_images/add', [App\Http\Controllers\V1\MovieimageController::class, 'store']);
+    Route::delete('movie_images/remove/{id}', [App\Http\Controllers\V1\MovieimageController::class, 'destroy']);
+
+    //GENRES REQUESTS
     Route::get('genres', [App\Http\Controllers\V1\GenreController::class, 'index']);
+    Route::post('genres/add', [App\Http\Controllers\V1\GenreController::class, 'store']);
 
-    Route::post('my_list_items/add_movie', [App\Http\Controllers\V1\MylistitemController::class, 'addMyListItem']);
-    Route::post('movies/add_movie', [App\Http\Controllers\V1\MovieController::class, 'addMovie']);
-    Route::post('movie_genres/add_movie_genre', [App\Http\Controllers\V1\MoviegenreController::class, 'addMovieGenre']);
-    Route::post('roles/add_roles', [App\Http\Controllers\V1\RoleController::class, 'addRoles']);
-    Route::post('actors/add_actor', [App\Http\Controllers\V1\ActorController::class, 'addActor']);
-    Route::post('genres/add_genre', [App\Http\Controllers\V1\GenreController::class, 'addGenre']);
+    //MOVIE GENRES REQUESTS
+    Route::post('movie_genres/add', [App\Http\Controllers\V1\MoviegenreController::class, 'store']);
+    Route::delete('movie_genres/remove/{id}', [App\Http\Controllers\V1\MoviegenreController::class, 'destroy']);
 
-    Route::post('movie_images/add_images', [App\Http\Controllers\V1\MovieimageController::class, 'addImages']);
+    //ROLES REQUESTS
+    Route::get('roles', [App\Http\Controllers\V1\RoleController::class, 'index']);
+    Route::post('roles/add', [App\Http\Controllers\V1\RoleController::class, 'store']);
+    Route::delete('roles/remove/{id}', [App\Http\Controllers\V1\RoleController::class, 'destroy']);
+
+    //MOVIE GENRES REQUESTS
+    Route::get('movie_genres', [App\Http\Controllers\V1\MoviegenreController::class, 'index']);
+    Route::delete('movie_genres/remove/{id}', [App\Http\Controllers\V1\MoviegenreController::class, 'destroy']);
+
+    //MY LIST ITEMS REQUESTS
+    Route::get('my_list_items', [App\Http\Controllers\V1\MylistitemController::class, 'index']);
+    Route::get('my_list_items/get_items', [App\Http\Controllers\V1\MylistitemController::class, 'getListItems']);
+    Route::post('my_list_items/add', [App\Http\Controllers\V1\MylistitemController::class, 'store']);
+    Route::delete('my_list_items/remove/{id}', [App\Http\Controllers\V1\MylistitemController::class, 'destroy']);
+
+    //ACTORS REQUESTS
+    Route::get('actors', [App\Http\Controllers\V1\ActorController::class, 'index']);
+    Route::post('actors/add', [App\Http\Controllers\V1\ActorController::class, 'store']);
 
 
-    Route::delete('my_list_items/remove_movie/{id}', [App\Http\Controllers\V1\MylistitemController::class, 'removeMyListItem']);
-    Route::delete('movies/remove_movie/{id}', [App\Http\Controllers\V1\MovieController::class, 'removeMovie']);
 
 
-    Route::get('search/{term}', [App\Http\Controllers\V1\MovieController::class, 'searchMovie']);
+
 
     //Route::apiResource('movies', MovieController::class);
     //Route::apiResource('actors', ActorController::class);

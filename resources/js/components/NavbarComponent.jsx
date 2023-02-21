@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, Navigate } from "react-router-dom"
 import "../../css/NavbarComponent.css";
-import Movie from "./Movie"
-import { Navbar, Nav, Container, Form, FormControl } from "react-bootstrap"
+import { Navbar, Nav, Container, Form } from "react-bootstrap"
 
 const NavbarComponent = () => {
-
     return (
         <div className="navbar-container">
             <div id='row'>
@@ -33,9 +31,6 @@ const NavbarComponent = () => {
                                     </Link>
                                     <Link to="/management">
                                         <div className="nav--link">Management</div>
-                                    </Link>
-                                    <Link to="/management/add_movie">
-                                        <div className="nav--link">Change</div>
                                     </Link>
                                 </Form>
                             </Navbar.Collapse>

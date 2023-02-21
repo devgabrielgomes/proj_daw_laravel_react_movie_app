@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import "../../../css/MovieInfo.css";
 import NavbarComponent from "../NavbarComponent";
-import { Container, Row, Col, Button, Toast } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import YouTube from "react-youtube";
 import { motion } from "framer-motion";
@@ -17,9 +17,9 @@ function MovieInfo() {
     const MOVIE_API = `http://localhost:8000/api/movies`
     const GENRE_API = `http://localhost:8000/api/movie_genres/`
     const ROLE_API = `http://localhost:8000/api/roles`
-    const LIST_ITEMS_API = `http://localhost:8000/api/my_list_items`
-    const ADD_LIST_API = `http://localhost:8000/api/my_list_items/add_movie`
-    const REMOVE_LIST_API = `http://localhost:8000/api/my_list_items/remove_movie/`
+    const LIST_ITEMS_API = `http://localhost:8000/api/my_list_items/get_items`
+    const ADD_LIST_API = `http://localhost:8000/api/my_list_items/add`
+    const REMOVE_LIST_API = `http://localhost:8000/api/my_list_items/remove/`
 
     const [movieInfo, setMovieInfo] = useState([])
     const [genresData, setGenresData] = useState([])
@@ -28,8 +28,6 @@ function MovieInfo() {
     const [movieActorsPhoto, setMovieActorsPhoto] = useState([])
     const [moviesInList, setMoviesInList] = useState([])
     const [nextListMovieId, setNextListMovieId] = useState("")
-
-    const [playTrailer, setPlayerTrailer] = useState(false)
 
     const [showRemoveModal, setShowRemoveModal] = useState(false)
     const handleCloseRemoveModal = () => setShowRemoveModal(false);
@@ -42,13 +40,16 @@ function MovieInfo() {
         getListData(LIST_ITEMS_API)
     }, [])
 
-    //Roles Data
+    /**
+     * GET request to set roles data
+     * @async
+     * @param ROLE_API
+     * @returns {Promise<void>}
+     */
     async function getRolesData(ROLE_API) {
         await fetch(ROLE_API)
             .then(res => res.json())
             .then(data => {
-                console.log("data role api:")
-                console.log(data)
                 var actors_name = [], movie_roles = [], actor_pic = [];
                 for (let i = 0; i < data.length; i++) {
                     if (data[i].idMovie == parseInt(id)) {
@@ -63,18 +64,27 @@ function MovieInfo() {
             })
     }
 
-    //Movie Data
+    /**
+     * GET request to set movie data
+     * @async
+     * @param MOVIE_API
+     * @returns {Promise<void>}
+     */
     async function getMovieData(MOVIE_API) {
         await fetch(MOVIE_API)
             .then(res => res.json())
             .then(data => {
-                console.log("data[id]:")
                 console.log(data[id - 1])
                 setMovieInfo(data[id - 1])
             })
     }
 
-    //Genre Data
+    /**
+     * GET request to set genres data
+     * @async
+     * @param GENRE_API
+     * @returns {Promise<void>}
+     */
     async function getGenresData(GENRE_API) {
         await fetch(GENRE_API)
             .then(res => res.json())
@@ -85,87 +95,111 @@ function MovieInfo() {
                         moviePossibleGenres.push(data[i].name)
                     }
                 }
-                // console.log(moviePossibleGenres)
                 setGenresData(moviePossibleGenres)
             })
     }
 
-    //List Data
+    /**
+     * GET request to set list items data
+     * @async
+     * @param LIST_ITEMS_API
+     * @returns {Promise<void>}
+     */
     async function getListData(LIST_ITEMS_API) {
         await fetch(LIST_ITEMS_API)
             .then(res => res.json())
             .then(data => {
                 setNextListMovieId(data.length + 1);
-                // console.log("listdata:")
-                // console.log(data)
                 setMoviesInList(data)
             })
     }
 
-    var hoursAndMinutes = parseInt(movieInfo.runtime / 60) + "h " + movieInfo.runtime % 60 + "m"
-
-    let trailer_key = "";
-    try {
-        trailer_key = movieInfo.trailer
-    } catch (error) {
-        trailer_key = ""
-    }
-
-    const opts = {
-        height: '562',
-        width: '1000',
-    }
-
-    //checkIfMovieInList()
-    //const trailer = selectedMovie.videos.results.find(vid -> vid.name === "Official Trailer")
-
+    /**
+     * DELETE request to remove a specific movie from the list
+     * @param id
+     */
     function removeMovie(id) {
         axios.delete(REMOVE_LIST_API + id)
             .then(() => {
                 getListData(LIST_ITEMS_API)
                 handleCloseRemoveModal()
-                toast.error(`You just removed "${movieInfo.title}" from your list!`, {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                });
+                toastSuccess(`You just removed "${movieInfo.title}" from your list!`)
+            })
+            .catch(({response})=>{
+                toastError(`Unable to remove "${movieInfo.title}" from your list!`)
             })
     }
 
-    //Add Movie to List
-    function addMovieToList(movie_id, nextListMovieId) {
-        const data = { "id": nextListMovieId, "fk_id_movie": movie_id, "fk_id_my_list": 1 };
+    /**
+     * POST request to add a specific movie to the list
+     * @param movie_id
+     * @param nextListMovieId
+     */
+    async function addMovieToList(movie_id, nextListMovieId) {
+        const addListFormData = new FormData()
+        addListFormData.append('id', nextListMovieId)
+        addListFormData.append('fk_id_movie', movie_id)
+        addListFormData.append('fk_id_movie', 1)
 
-        fetch(ADD_LIST_API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
+        await axios.post(ADD_LIST_API, addListFormData)
             .then(() => {
-                console.log('Success:', data);
                 getListData(LIST_ITEMS_API)
-                toast.success(`You just added "${movieInfo.title}" to your list!`, {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                });
+                toastSuccess(`You just added "${movieInfo.title}" to your list!`)
+            })
+            .catch(({response}) => {
+                toastError(`Unable to add "${movieInfo.title}" to your list!`)
             })
     }
 
-    function buttonAddMovieClick() {
-        addMovieToList(id, nextListMovieId)
+    /**
+     * Display a success toast with a specific message
+     * @param message
+     */
+    function toastSuccess(message) {
+        toast.success(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
+    }
+
+    /**
+     * Display an error toast with a specific message
+     * @param message
+     */
+    function toastError(message) {
+        toast.error(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
+    }
+
+    // Transform movie runtime to hours and minutes
+    let hoursAndMinutes = parseInt(movieInfo.runtime / 60) + "h " + movieInfo.runtime % 60 + "m"
+
+    // Set the trailer information
+    let trailer_key = "";
+    try {
+        trailer_key = movieInfo.trailer
+    } catch({error}) {
+        trailer_key = ""
+        toastError(`Unable to get the trailer key!`)
+    }
+
+    const opts = {
+        height: '562',
+        width: '1000',
     }
 
     return (
@@ -199,13 +233,11 @@ function MovieInfo() {
                                                 <i className="far fa-trash-alt"></i>  Remove from list
                                             </Button>}
                                         </motion.div>
-
                                         :
-
                                         <motion.div
                                             whileTap={{ scale: 0.9 }}
                                         >
-                                            {<Button className="movie-list-button-option" variant="outline-success" id="btn-add-movie" onClick={buttonAddMovieClick}>
+                                            {<Button className="movie-list-button-option" variant="outline-success" id="btn-add-movie" onClick={() => addMovieToList(id, nextListMovieId)}>
                                                 <i className="fas fa-folder-plus"></i>  Add to my list
                                             </Button>}
                                         </motion.div>

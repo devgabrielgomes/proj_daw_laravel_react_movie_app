@@ -2,18 +2,21 @@ import React, {useEffect, useState} from "react";
 import NavbarComponent from "@/components/NavbarComponent";
 import {Button, Table, Row, Col} from "react-bootstrap";
 import "../../../css/Management.css";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { motion } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ListMovie from "@/components/ListMovie";
-import Modal from "react-bootstrap/Modal";
-import ManagementMovie from "@/components/ManagementMovie";
+import ManagementMovie from "../../components/ManagementMovie";
 
 const MOVIE_API = `http://localhost:8000/api/movies`
-const REMOVE_MOVIE_API = `http://localhost:8000/api/movies/remove_movie/`
+const REMOVE_MOVIE_API = `http://localhost:8000/api/movies/remove/`
+const REMOVE_MOVIE_IMAGES_API = `http://localhost:8000/api/movie_images/remove/`
+const REMOVE_MOVIE_GENRES_API = `http://localhost:8000/api/movie_genres/remove/`
+const REMOVE_ROLES_API = `http://localhost:8000/api/roles/remove/`
+const REMOVE_LIST_ITEM_API = `http://localhost:8000/api/my_list_items/remove/`
 
 function Management() {
+    const navigate = useNavigate()
     const [movies, setMovies] = useState([])
     const [showRemoveModal, setShowRemoveModal] = useState(false)
     const handleCloseRemoveModal = () => setShowRemoveModal(false);
@@ -22,34 +25,105 @@ function Management() {
         getMovies(MOVIE_API)
     }, [])
 
-
+    /**
+     * GET request to set movie data
+     * @async
+     * @param MOVIE_API
+     * @returns {Promise<void>}
+     */
     async function getMovies(MOVIE_API) {
         await fetch(MOVIE_API)
             .then(res => res.json())
             .then(data => {
-                console.log("getMovies:")
-                console.log(data)
                 setMovies(data)
             })
     }
 
+    /**
+     * DELETE request to remove a specific movie from the system
+     * @param id
+     * @param title
+     * @returns {Promise<void>}
+     */
     const removeMovie = async (id, title) => {
-        console.log(id);
+        handleCloseRemoveModal()
+        axios.delete(REMOVE_MOVIE_GENRES_API + id)
+            .then(() => {
+                toastSuccess(`You just removed "${title}" genres from the system!`);
+            })
+            .catch(({response})=>{
+                toastError(`Unable to remove "${title}" genres from the system!`)
+            })
+
+        axios.delete(REMOVE_ROLES_API + id)
+            .then(() => {
+                toastSuccess(`You just removed "${title}" roles from the system!`);
+            })
+            .catch(({response})=>{
+                toastError(`Unable to remove "${title}" roles from the system!`)
+            })
+
+        axios.delete(REMOVE_LIST_ITEM_API + id)
+            .then(() => {
+                toastSuccess(`You just removed "${title}" from all lists!`);
+            })
+            .catch(({response})=>{
+                toastError(`Unable to remove "${title}" from all lists!`)
+            })
+
         axios.delete(REMOVE_MOVIE_API + id)
             .then(() => {
-                getMovies(MOVIE_API)
-                handleCloseRemoveModal()
-                toast.error(`You just removed "${title}" from your list!`, {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                });
+                toastSuccess(`You just removed "${title}" from the system!`);
             })
+            .catch(({response})=>{
+                toastError(`Unable to remove "${title}" from the system!`)
+            })
+
+        await wait(3500)
+        navigate("/management")
+    }
+
+    /**
+     * Stop the execution for a certain amount of time
+     * @param ms
+     * @returns {Promise<unknown>}
+     */
+    function wait(ms) {
+        return new Promise( (resolve) => {setTimeout(resolve, ms)});
+    }
+
+    /**
+     * Display a success toast with a specific message
+     * @param message
+     */
+    function toastSuccess(message) {
+        toast.success(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
+    }
+
+    /**
+     * Display an error toast with a specific message
+     * @param message
+     */
+    function toastError(message) {
+        toast.error(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
     }
 
     return (
@@ -79,7 +153,6 @@ function Management() {
                         </Link>
                     </Col>
                 </Row>
-
 
                 <Table className="table" striped bordered hover variant="dark">
                     <thead>

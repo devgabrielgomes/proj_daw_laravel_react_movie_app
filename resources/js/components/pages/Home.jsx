@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import "../../../css/Home.css";
 import Movie from "../Movie"
-import MovieInfo from "./MovieInfo"
 import NavbarComponent from "../NavbarComponent"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { motion } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-//const FEATURED_API = `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=3bf31c72f99e4189266c43358ac6e189&page=1`
 const FEATURED_API = `http://localhost:8000/api/movies`
-const SEARCH_API = `http://localhost:8000/api/search/`
+const SEARCH_API = `http://localhost:8000/api/movies/search/`
 
 const Home = () => {
     const [movies, setMovies] = useState([])
@@ -20,46 +18,62 @@ const Home = () => {
         getMovies(FEATURED_API)
     }, [])
 
+    /**
+     * GET request to set movie data
+     * @async
+     * @param API
+     * @returns {Promise<void>}
+     */
     async function getMovies(API) {
         await fetch(API)
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 if (data.length > 0) {
-                    console.log("movies:")
-                    console.log(data)
                     setMovies(data)
                 } else {
-                    toast.error(`The movie that you searched doesn't exists in our system!`, {
-                        position: "top-right",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "dark",
-                    });
+                    toastError(`The movie that you searched doesn't exists in our system!`);
                 }
             })
     }
 
+    /**
+     * Execute the GET request with the user input
+     * @param e
+     */
     const handleOnSubmit = (e) => {
         e.preventDefault()
         if (searchTerm) {
-            console.log("getMovies(SEARCH_API + searchTerm):")
             console.log(SEARCH_API + searchTerm)
             getMovies(SEARCH_API + searchTerm)
-
         }
     }
 
+    /**
+     * Set the search term with the user input
+     * @param e
+     */
     const handleOnChange = (e) => {
         setSearchTerm(e.target.value)
-        console.log(e.target.value)
         if(e.target.value == "") {
             getMovies(FEATURED_API)
         }
+    }
+
+    /**
+     * Display an error toast with a specific message
+     * @param message
+     */
+    function toastError(message) {
+        toast.error(`${message}`, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
     }
 
     return (

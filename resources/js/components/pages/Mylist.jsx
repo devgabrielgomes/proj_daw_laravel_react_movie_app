@@ -5,11 +5,9 @@ import ListMovie from "../ListMovie"
 import { motion } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Movie from "@/components/Movie";
 
-const GET_LIST_MOVIES_API = `http://localhost:8000/api/get_list_movies`
-const REMOVE_LIST_API = `http://localhost:8000/api/my_list_items/remove_movie/`
-
+const LIST_MOVIES_API = `http://localhost:8000/api/my_list_items`
+const REMOVE_LIST_API = `http://localhost:8000/api/my_list_items/remove/`
 
 function Mylist() {
     const [listMovies, setListMovies] = useState([])
@@ -18,11 +16,16 @@ function Mylist() {
 
 
     useEffect(() => {
-        getListMovies(GET_LIST_MOVIES_API)
+        getListMovies(LIST_MOVIES_API)
     }, [])
 
-    async function getListMovies(GET_LIST_MOVIES_API) {
-        await fetch(GET_LIST_MOVIES_API)
+    /**
+     * GET request to get list movies data
+     * @param LIST_MOVIES_API
+     * @returns {Promise<void>}
+     */
+    async function getListMovies(LIST_MOVIES_API) {
+        await fetch(LIST_MOVIES_API)
             .then(res => res.json())
             .then(data => {
                 if (!data.errors) {
@@ -34,22 +37,56 @@ function Mylist() {
             });
     }
 
+    /**
+     * DELETE request to remove a specific movie from the list
+     * @param id
+     * @param title
+     * @returns {Promise<void>}
+     */
     const removeMovie = async (id, title) => {
         axios.delete(REMOVE_LIST_API + id)
             .then(() => {
-                getListMovies(GET_LIST_MOVIES_API)
+                getListMovies(LIST_MOVIES_API)
                 handleCloseRemoveModal()
-                toast.error(`You just removed "${title}" from your list!`, {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                });
+                toastSuccess(`You just removed "${title}" from your list!`)
             })
+            .catch(({response})=>{
+                toastError(`Unable to remove "${title}" from your list!`)
+            })
+    }
+
+    /**
+     * Display a success toast with a specific message
+     * @param message
+     */
+    function toastSuccess(message) {
+        toast.success(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
+    }
+
+    /**
+     * Display an error toast with a specific message
+     * @param message
+     */
+    function toastError(message) {
+        toast.error(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
     }
 
     return (
@@ -78,8 +115,6 @@ function Mylist() {
                         :
                         <h1 className="no-movies">You don't have any movies in your list!</h1>
                 }
-
-
             </motion.div>
             <ToastContainer
                 position="top-right"

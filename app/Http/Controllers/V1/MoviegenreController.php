@@ -17,23 +17,9 @@ class MoviegenreController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Support\Collection
      */
-    public function index(Request $request)
-    {
-        $filter = new MoviegenreFilter();
-        $filterItems = $filter->transform($request); //[['column', 'operator', 'value']]
-        if(count($filterItems) == 0) {
-            return new MoviegenreCollection(Moviegenre::all());
-        } else {
-            $movie_genres = Moviegenre::where($filterItems)->paginate();
-
-            return new MoviegenreCollection($movie_genres->appends($request->query()));
-        }
-    }
-
-    public function getMovieGenres()
+    public function index()
     {
         $result = DB::table('movie_genres')
             ->join('genres', 'movie_genres.fk_id_genre', '=', 'genres.id')
@@ -43,7 +29,12 @@ class MoviegenreController extends Controller
         return $result;
     }
 
-    public function addMovieGenre(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     * @param Request $request
+     * @return void
+     */
+    public function store(Request $request)
     {
         $id = $request->id;
         $fk_id_movie = $request->fk_id_movie;
@@ -57,18 +48,6 @@ class MoviegenreController extends Controller
             ];
             DB::table('movie_genres')->insert($datasave);
         }
-    }
-
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreMoviegenreRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreMoviegenreRequest $request)
-    {
-        return new MoviegenreResource(Moviegenre::create($request->all()));
     }
 
     /**
@@ -100,8 +79,8 @@ class MoviegenreController extends Controller
      * @param  \App\Models\Moviegenre  $moviegenre
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Moviegenre $moviegenre)
+    public function destroy($id)
     {
-        //
+        Moviegenre::where('fk_id_movie', '=', $id)->delete();
     }
 }

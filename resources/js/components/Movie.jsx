@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import "../../css/Movie.css";
 import {Link} from 'react-router-dom';
 import { motion } from "framer-motion";
 import star from "./images/star.png";
-
 
 function Movie({ movie: { id, title, year, rating, cover} }) {
     return (

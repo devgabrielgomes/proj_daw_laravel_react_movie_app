@@ -15,14 +15,22 @@ class MylistitemController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Support\Collection
      */
     public function index()
     {
-        return new MylistitemCollection(Mylistitem::all());
+        $results = DB::table('my_list_items')
+            ->join('movie_images', 'my_list_items.fk_id_movie', '=', 'movie_images.id')
+            ->join('movies', 'my_list_items.fk_id_movie', '=', 'movies.id')
+            ->select('movies.*', 'movie_images.cover as cover', 'movie_images.background as background')
+            ->get();
+        return $results;
     }
 
+    /**
+     * Get items in list
+     * @return \Illuminate\Support\Collection
+     */
     public function getListItems()
     {
         $result = DB::table('my_list_items')
@@ -33,51 +41,19 @@ class MylistitemController extends Controller
         return $result;
     }
 
-    public function getListMovies()
+    /**
+     * Store a newly created resource in storage.
+     * @param Request $request
+     * @return void
+     */
+    public function store(Request $request)
     {
-        $results = DB::table('my_list_items')
-            ->join('movie_images', 'my_list_items.fk_id_movie', '=', 'movie_images.id')
-            ->join('movies', 'my_list_items.fk_id_movie', '=', 'movies.id')
-            ->select('movies.*', 'movie_images.cover as cover', 'movie_images.background as background')
-            ->get();
-
-        return $results;
-    }
-
-    public function addMyListItem(Request $request) {
         $my_list_item = new Mylistitem();
 
         $my_list_item->id = $request->id;
         $my_list_item->fk_id_movie = $request->fk_id_movie;
         $my_list_item->fk_id_my_list = $request->fk_id_my_list;
         $my_list_item->save();
-    }
-
-    public function removeMyListItem($id) {
-        $item = Mylistitem::where('fk_id_movie', '=', $id);
-        $item->delete();
-    }
-
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreMylistitemRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreMylistitemRequest $request)
-    {
-        //
     }
 
     /**
@@ -116,12 +92,11 @@ class MylistitemController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Mylistitem  $mylistitem
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return void
      */
-    public function destroy(Mylistitem $mylistitem)
+    public function destroy($id)
     {
-        //
+        Mylistitem::where('fk_id_movie', '=', $id)->delete();
     }
 }

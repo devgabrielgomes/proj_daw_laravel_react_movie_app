@@ -15,106 +15,127 @@ function AddMovie() {
 
     const GENRE_API = `http://localhost:8000/api/genres`
     const ACTOR_API = `http://localhost:8000/api/actors`
-    const ADD_GENRE_API = `http://localhost:8000/api/genres/add_genre`
-    const ADD_ACTOR_API = `http://localhost:8000/api/actors/add_actor`
+    const ADD_GENRE_API = `http://localhost:8000/api/genres/add`
+    const ADD_ACTOR_API = `http://localhost:8000/api/actors/add`
 
     useEffect(() => {
         getNextActorID(ACTOR_API)
         getNextGenreID(GENRE_API)
     }, [])
 
-    function wait(ms) {
-        return new Promise( (resolve) => {setTimeout(resolve, ms)});
-    }
-
+    /**
+     * POST request to add new actor
+     * @async
+     * @param e
+     * @returns {Promise<void>}
+     */
     const postActor = async (e) => {
         const actorFormData = new FormData()
         actorFormData.append('id', nextActorID)
         actorFormData.append('name', actorName)
 
         await axios.post(ADD_ACTOR_API, actorFormData)
-            .then(async ({data}) => {
-                toast.success(`Actor added successfully!`, {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                })
+            .then(async () => {
+                toastSuccess(`Actor added successfully!`)
                 await wait(3500)
                 navigate("/management")
             })
             .catch(({response})=>{
-                toast.error("Unable to add actor! Check actor parameters.", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                })
+                toastError("Unable to add actor! Check actor parameters.")
             })
     }
 
+    /**
+     * POST request to add new genre
+     * @async
+     * @param e
+     * @returns {Promise<void>}
+     */
     const postGenre = async (e) => {
         const genreFormData = new FormData()
         genreFormData.append('id', nextGenreID)
         genreFormData.append('name', genreName)
 
         await axios.post(ADD_GENRE_API, genreFormData)
-            .then(async ({data}) => {
-                toast.success(`Genre added successfully!`, {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                })
+            .then(async () => {
+                toastSuccess(`Genre added successfully!`)
                 await wait(3500)
                 navigate("/management")
             })
             .catch(({response})=>{
-                toast.error("Unable to add genre! Check genre parameters.", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                })
+                toastError("Unable to add genre! Check genre parameters.")
             })
     }
 
-    //Next Actor ID
+    /**
+     * GET request to set next actor ID
+     * @async
+     * @param ACTOR_API
+     * @returns {Promise<void>}
+     */
     async function getNextActorID(ACTOR_API) {
         await fetch(ACTOR_API)
             .then(res => res.json())
             .then(data => {
-                console.log("getNextActorID:")
-                console.log(data.data.length + 1)
                 setNextActorID(data.data.length + 1)
             })
     }
 
-    //Next Genre Genre ID
+    /**
+     * GET request to set next genre id
+     * @async
+     * @param GENRE_API
+     * @returns {Promise<void>}
+     */
     async function getNextGenreID(GENRE_API) {
         await fetch(GENRE_API)
             .then(res => res.json())
             .then(data => {
-                console.log("getNextGenreGenreID:")
-                console.log(data.data.length + 1)
                 setNextGenreID(data.data.length + 1)
             })
+    }
+
+    /**
+     * Stop the execution for a certain amount of time
+     * @param ms
+     * @returns {Promise<unknown>}
+     */
+    function wait(ms) {
+        return new Promise( (resolve) => {setTimeout(resolve, ms)});
+    }
+
+    /**
+     * Display a success toast with a specific message
+     * @param message
+     */
+    function toastSuccess(message) {
+        toast.success(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
+    }
+
+    /**
+     * Display an error toast with a specific message
+     * @param message
+     */
+    function toastError(message) {
+        toast.error(`${message}`, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
     }
 
     return (

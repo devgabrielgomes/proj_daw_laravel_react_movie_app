@@ -15,8 +15,8 @@ class ActorController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return ActorCollection
      */
     public function index(Request $request)
     {
@@ -31,33 +31,17 @@ class ActorController extends Controller
         }
     }
 
-    public function addActor(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     * @param Request $request
+     * @return void
+     */
+    public function store(Request $request)
     {
         $actor = new Actor();
         $actor->id = $request->id;
         $actor->name = $request->name;
         $actor->save();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreActorRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreActorRequest $request)
-    {
-        //
     }
 
     /**

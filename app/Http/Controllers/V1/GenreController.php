@@ -15,8 +15,8 @@ class GenreController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return GenreCollection
      */
     public function index(Request $request)
     {
@@ -31,23 +31,17 @@ class GenreController extends Controller
         }
     }
 
-    public function addGenre(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     * @param Request $request
+     * @return void
+     */
+    public function store(Request $request)
     {
         $genre = new Genre();
         $genre->id = $request->id;
         $genre->name = $request->name;
         $genre->save();
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreGenreRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreGenreRequest $request)
-    {
-        return new GenreResource(Genre::create($request->all()));
     }
 
     /**

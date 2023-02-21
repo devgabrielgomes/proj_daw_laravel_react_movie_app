@@ -3,13 +3,9 @@ import NavbarComponent from "../NavbarComponent";
 import {Button, Form, Row, Col} from "react-bootstrap";
 import "../../../css/EditMovie.css";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {read} from "@popperjs/core";
-import { motion } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ListMovie from "@/components/ListMovie";
 import {parseInt} from "lodash";
-import {forIn} from "lodash/object";
 
 function EditMovie() {
     const navigate = useNavigate()
@@ -37,7 +33,6 @@ function EditMovie() {
     const [coverImage, setCoverImage] = useState();
     const [background, setBackground] = useState();
     const [backgroundImage, setBackgroundImage] = useState();
-
 
     useEffect(() => {
         getMovieData(MOVIE_API)
@@ -70,13 +65,16 @@ function EditMovie() {
         }
     }, [background]);
 
-    //Movie Data
+    /**
+     * GET request to set movie data
+     * @async
+     * @param MOVIE_API
+     * @returns {Promise<void>}
+     */
     async function getMovieData(MOVIE_API) {
         await fetch(MOVIE_API)
             .then(res => res.json())
             .then(data => {
-                console.log("data[id]:")
-                console.log(data[id - 1])
                 setTitle(data[id - 1].title)
                 setYear(data[id - 1].year)
                 setSynopsis(data[id - 1].synopsis)
@@ -88,7 +86,12 @@ function EditMovie() {
             })
     }
 
-    //Genre Data
+    /**
+     * GET request to set genres data
+     * @async
+     * @param GENRE_API
+     * @returns {Promise<void>}
+     */
     async function getGenresData(GENRE_API) {
         await fetch(GENRE_API)
             .then(res => res.json())
@@ -103,7 +106,12 @@ function EditMovie() {
             })
     }
 
-    //Genre Data
+    /**
+     * GET request to set movie genres data
+     * @async
+     * @param MOVIE_GENRE_API
+     * @returns {Promise<void>}
+     */
     async function getMovieGenresData(MOVIE_GENRE_API) {
         await fetch(MOVIE_GENRE_API)
             .then(res => res.json())
@@ -122,7 +130,7 @@ function EditMovie() {
             })
     }
 
-    //Roles Data
+    //Get roles data
     async function getRolesData(ROLE_API) {
         await fetch(ROLE_API)
             .then(res => res.json())
@@ -142,12 +150,11 @@ function EditMovie() {
             })
     }
 
-
-
-    function onCoverChange() {
-        var newCover = document.getElementById("new-cover").value;
-        console.log("newCover: ", newCover)
-    }
+    //
+    // function onCoverChange() {
+    //     var newCover = document.getElementById("new-cover").value;
+    //     console.log("newCover: ", newCover)
+    // }
 
     const editMovie = async (e) => {
         e.preventDefault()
