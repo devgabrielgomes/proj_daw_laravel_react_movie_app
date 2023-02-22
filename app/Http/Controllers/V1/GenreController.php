@@ -26,7 +26,6 @@ class GenreController extends Controller
             return new GenreCollection(Genre::all());
         } else {
             $genres = Genre::where($filterItems)->paginate();
-
             return new GenreCollection($genres->appends($request->query()));
         }
     }
@@ -39,7 +38,6 @@ class GenreController extends Controller
     public function store(Request $request)
     {
         $genre = new Genre();
-        $genre->id = $request->id;
         $genre->name = $request->name;
         $genre->save();
     }

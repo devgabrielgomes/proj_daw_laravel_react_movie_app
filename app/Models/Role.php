@@ -11,7 +11,6 @@ class Role extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'fk_id_movie',
         'fk_id_actor',
         'name',

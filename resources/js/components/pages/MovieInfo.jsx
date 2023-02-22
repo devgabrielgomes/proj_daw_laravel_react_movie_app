@@ -27,7 +27,6 @@ function MovieInfo() {
     const [actorsInMovie, setActorsInMovie] = useState([])
     const [movieActorsPhoto, setMovieActorsPhoto] = useState([])
     const [moviesInList, setMoviesInList] = useState([])
-    const [nextListMovieId, setNextListMovieId] = useState("")
 
     const [showRemoveModal, setShowRemoveModal] = useState(false)
     const handleCloseRemoveModal = () => setShowRemoveModal(false);
@@ -74,8 +73,11 @@ function MovieInfo() {
         await fetch(MOVIE_API)
             .then(res => res.json())
             .then(data => {
-                console.log(data[id - 1])
-                setMovieInfo(data[id - 1])
+                for (let i = 0; i < data.length; i++) {
+                    if(data[i].id == id) {
+                        setMovieInfo(data[i])
+                    }
+                }
             })
     }
 
@@ -109,7 +111,6 @@ function MovieInfo() {
         await fetch(LIST_ITEMS_API)
             .then(res => res.json())
             .then(data => {
-                setNextListMovieId(data.length + 1);
                 setMoviesInList(data)
             })
     }
@@ -134,7 +135,6 @@ function MovieInfo() {
      */
     async function addMovieToList() {
         const addListFormData = new FormData()
-        addListFormData.append('id', nextListMovieId)
         addListFormData.append('fk_id_movie', id)
         addListFormData.append('fk_id_my_list', 1)
 
@@ -183,6 +183,7 @@ function MovieInfo() {
     }
 
     // Transform movie runtime to hours and minutes
+
     let hoursAndMinutes = parseInt(movieInfo.runtime / 60) + "h " + movieInfo.runtime % 60 + "m"
 
     // Set the trailer information

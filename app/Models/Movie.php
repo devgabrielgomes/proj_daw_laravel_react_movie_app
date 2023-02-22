@@ -11,7 +11,6 @@ class Movie extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'title',
         'year',
         'rating',

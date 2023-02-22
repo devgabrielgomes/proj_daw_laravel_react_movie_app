@@ -12,7 +12,6 @@ class Mylistitem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
         'fk_id_movie',
         'fk_id_my_list',
     ];

@@ -11,7 +11,6 @@ class Genre extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'name'
     ];
 

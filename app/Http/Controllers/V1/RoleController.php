@@ -37,7 +37,9 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        $id = $request->id;
+        $role = Role::all()->last();
+        $id = $role->id + 1;
+
         $fk_id_movie = $request->fk_id_movie;
         $actors = $request->actors;
         $roles = $request->roles;
@@ -66,14 +68,29 @@ class RoleController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateRoleRequest  $request
-     * @param  \App\Models\Role  $role
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param $id
+     * @return void
      */
-    public function update(UpdateRoleRequest $request, Role $role)
+    public function update(Request $request, $id)
     {
-        //
+        Role::where('fk_id_movie', $id)->delete();
+        $role = Role::all()->last();
+
+        $id = $role->id + 1;
+        $fk_id_movie = $request->fk_id_movie;
+        $actors = $request->actors;
+        $roles = $request->roles;
+
+        for($i=0; $i<count($actors); $i++){
+            $datasave = [
+                'id' => $id + $i,
+                'fk_id_movie' => $fk_id_movie,
+                'fk_id_actor' => $actors[$i],
+                'name' => $roles[$i],
+            ];
+            DB::table('roles')->insert($datasave);
+        }
     }
 
     /**

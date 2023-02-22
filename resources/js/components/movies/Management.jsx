@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ManagementMovie from "../../components/ManagementMovie";
 
 const MOVIE_API = `http://localhost:8000/api/movies`
+const MOVIE_API_RAW = `http://localhost:8000/api/movies/raw`
 const REMOVE_MOVIE_API = `http://localhost:8000/api/movies/remove/`
 const REMOVE_MOVIE_IMAGES_API = `http://localhost:8000/api/movie_images/remove/`
 const REMOVE_MOVIE_GENRES_API = `http://localhost:8000/api/movie_genres/remove/`
@@ -23,7 +24,7 @@ function Management() {
     const handleShowRemoveModal = () => setShowRemoveModal(true);
 
     useEffect(() => {
-        getMovies(MOVIE_API)
+        getMovies(MOVIE_API_RAW)
     }, [])
 
     /**
@@ -47,40 +48,11 @@ function Management() {
      * @returns {Promise<void>}
      */
     const removeMovie = async (id, title) => {
-        var id = 15
         handleCloseRemoveModal()
-        // axios.delete(REMOVE_MOVIE_GENRES_API + id)
-        //     .then(() => {
-        //         toastSuccess(`You just removed "${title}" genres from the system!`);
-        //     })
-        //     .catch(({response})=>{
-        //         toastError(`Unable to remove "${title}" genres from the system!`)
-        //     })
-        //
-        // axios.delete(REMOVE_ROLES_API + id)
-        //     .then(() => {
-        //         toastSuccess(`You just removed "${title}" roles from the system!`);
-        //     })
-        //     .catch(({response})=>{
-        //         toastError(`Unable to remove "${title}" roles from the system!`)
-        //     })
-        //
-        // axios.delete(REMOVE_LIST_ITEM_API + id)
-        //     .then(() => {
-        //         toastSuccess(`You just removed "${title}" from all lists!`);
-        //     })
-        //     .catch(({response})=>{
-        //         toastError(`Unable to remove "${title}" from all lists!`)
-        //     })
-
+        axios.delete(REMOVE_MOVIE_GENRES_API + id)
+        axios.delete(REMOVE_ROLES_API + id)
         axios.delete(REMOVE_MOVIE_IMAGES_API + id)
-            .then(() => {
-                toastSuccess(`You just removed "${title}" images from the system!`);
-            })
-            .catch(({response})=>{
-                toastError(`Unable to remove "${title}" images from the system!`)
-            })
-
+        axios.delete(REMOVE_LIST_ITEM_API + id)
         axios.delete(REMOVE_MOVIE_API + id)
             .then(() => {
                 toastSuccess(`You just removed "${title}" from the system!`);
@@ -89,7 +61,7 @@ function Management() {
                 toastError(`Unable to remove "${title}" from the system!`)
             })
         await wait(3500)
-        window.location.reload(false);
+        await getMovies(MOVIE_API_RAW)
     }
 
     /**

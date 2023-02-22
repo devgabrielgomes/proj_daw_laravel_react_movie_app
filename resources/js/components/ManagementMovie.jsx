@@ -15,7 +15,7 @@ function ManagementMovie ({ movie: { id, title, cover}, removeMovie}) {
                     {id}
                 </td>
                 <td key={"movie_image_" + id}>
-                    <img src={`/uploads/movie_images/cover/${cover}`} width="80px" alt="movie-poster"></img>
+                    <img src={`/uploads/movie_images/cover/cover_movie_${id}.jpg`} width="80px" alt="movie-poster"></img>
                 </td>
                 <td className="title">{title}</td>
                 <td>

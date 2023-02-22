@@ -29,6 +29,25 @@ class MovieController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     * @return \Illuminate\Support\Collection
+     */
+    public function getMovieID($term)
+    {
+        return Movie::where("title","like",$term)
+            ->get('movies.id');
+    }
+
+    /**
+     * Display a listing of the resource.
+     * @return \Illuminate\Support\Collection
+     */
+    public function raw()
+    {
+        return Movie::all();
+    }
+
+    /**
      * Store a newly created resource in storage.
      * @param Request $request
      * @return void
@@ -36,7 +55,6 @@ class MovieController extends Controller
     public function store(Request $request)
     {
         $movie = new Movie();
-        $movie->id = $request->id;
         $movie->title = $request->title;
         $movie->year = $request->year;
         $movie->rating = $request->rating;
@@ -75,9 +93,16 @@ class MovieController extends Controller
      * @param  \App\Models\Movie  $movie
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateMovieRequest $request, Movie $movie)
+    public function update(Request $request, $id)
     {
-        //
+        $movie = Movie::find($id);
+        $movie->title = $request->title;
+        $movie->year = $request->year;
+        $movie->rating = $request->rating;
+        $movie->synopsis = $request->synopsis;
+        $movie->trailer = $request->trailer;
+        $movie->runtime = $request->runtime;
+        $movie->save();
     }
 
     /**

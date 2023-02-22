@@ -9,10 +9,6 @@ import {parseInt} from "lodash";
 
 function AddMovie() {
     const navigate = useNavigate()
-    const [nextMovieID, setNextMovieID] = useState()
-    const [nextMovieGenreID, setNextMovieGenreID] = useState()
-    const [nextRoleID, setNextRoleID] = useState()
-    const [nextMovieImageID, setNextMovieImageID] = useState()
     const [title, setTitle] = useState("");
     const [synopsis, setSynopsis] = useState("");
     const [year, setYear] = useState("");
@@ -20,12 +16,12 @@ function AddMovie() {
     const [allGenres, setAllGenres] = useState([]);
     const [allActors, setAllActors] = useState([]);
     const [selectedRoles, setSelectedRoles] = useState("");
-
     const [runtime, setRuntime] = useState("");
     const [trailer, setTrailer] = useState("");
     const [genres, setSelectedOptionsGenres] = useState([]);
     const [actors, setSelectedOptionsActors] = useState([]);
-    const MOVIE_API = `http://localhost:8000/api/movies`
+
+    const MOVIE_API = `http://localhost:8000/api/movies/get_movie_id/`
     const GENRE_API = `http://localhost:8000/api/genres/`
     const MOVIE_GENRE_API = `http://localhost:8000/api/movie_genres`
     const ROLE_API = `http://localhost:8000/api/roles`
@@ -53,10 +49,6 @@ function AddMovie() {
 
     useEffect(() => {
         getGenresData(GENRE_API)
-        getRolesData(ROLE_API)
-        getNextMovieGenreID(MOVIE_GENRE_API)
-        getNextRoleID(ROLE_API)
-        getNextMovieID(MOVIE_API)
         getActorsData(ACTOR_API)
     }, [])
 
@@ -67,7 +59,7 @@ function AddMovie() {
      */
     const changeHandlerGenres = (e) => {
         let selected_genres = Array.from(e.target.selectedOptions, option => parseInt(option.value));
-        console.log(selected_genres)
+
         setSelectedOptionsGenres(selected_genres);
     }
 
@@ -80,19 +72,15 @@ function AddMovie() {
         setSelectedOptionsActors(selected_actors);
     }
 
+
     /**
-     * Execute all the post needed to add a movie to the system
+     * Execute all the post requests needed to add a movie to the system
      * @param e
      * @returns {Promise<void>}
      */
     const postForm = async (e) => {
         e.preventDefault()
         await postMovie()
-        await postMovieGenres()
-        await postMovieRoles()
-        await postMovieImages()
-
-        await wait(3500)
         navigate("/management")
     }
 
@@ -103,144 +91,50 @@ function AddMovie() {
      * @returns {Promise<void>}
      */
     const postMovie = async (e) => {
-        const movieFormData = new FormData()
-        movieFormData.append('id', nextMovieID)
-        movieFormData.append('title', title)
-        movieFormData.append('year', year)
-        movieFormData.append('rating', rating)
-        movieFormData.append('synopsis', synopsis)
-        movieFormData.append('trailer', trailer)
-        movieFormData.append('runtime', runtime)
-
-        await axios.post(ADD_MOVIE_API, movieFormData)
-            .then(() => {
-                toastSuccess(`Movie added successfully!`)
-            })
-            .catch(({response})=>{
-                toastError("Unable to add movie! Check movie parameters.")
-            })
-    }
-
-    /**
-     * POST request to add the new movie genres
-     * @async
-     * @param e
-     * @returns {Promise<void>}
-     */
-    const postMovieGenres = async (e) => {
+        let movieData = {'title': title, 'year': year, 'rating': rating, 'synopsis': synopsis, 'trailer': trailer, 'runtime': runtime}
         const movieGenresFormData = new FormData()
-
-        movieGenresFormData.append('id', nextMovieGenreID)
-        movieGenresFormData.append('fk_id_movie', nextMovieID)
-        for (var i = 0; i < genres.length; i++) {
-            movieGenresFormData.append('genres[]', genres[i]);
-        }
-
-        await axios.post(ADD_MOVIE_GENRE_API, movieGenresFormData)
-            .then(() => {
-                toastSuccess(`Movie genres added successfully!`)
-            })
-            .catch(({response})=>{
-                toastError("Unable to add movie genres! Check movie parameters.")
-            })
-    }
-
-    /**
-     * POST request to add the new movie roles
-     * @async
-     * @param e
-     * @returns {Promise<void>}
-     */
-    const postMovieRoles = async (e) => {
-        let roles = selectedRoles.split(',');
-        const rolesFormData = new FormData()
-        rolesFormData.append('id', nextRoleID)
-        rolesFormData.append('fk_id_movie', nextMovieID)
-        for (var i = 0; i < actors.length; i++) {
-            rolesFormData.append('actors[]', actors[i]);
-        }
-        for (var i = 0; i < roles.length; i++) {
-            rolesFormData.append('roles[]', roles[i]);
-        }
-
-        await axios.post(ADD_ROLES_API, rolesFormData)
-            .then(() => {
-                toastSuccess(`Movie roles added successfully!`)
-            })
-            .catch(({response})=>{
-                toastError("Unable to add movies roles! Check movie parameters.")
-            })
-    }
-
-    /**
-     * POST request to add the new movie images
-     * @async
-     * @param e
-     * @returns {Promise<void>}
-     */
-    const postMovieImages = async (e) => {
+        const movieRolesFormData = new FormData()
         const movieImagesFormData = new FormData()
-        movieImagesFormData.append('id', nextMovieID)
-        movieImagesFormData.append('fk_id_movie', nextMovieID)
-        movieImagesFormData.append('cover', cover.coverAsFile)
-        movieImagesFormData.append('background', background.backgroundAsFile)
+        axios.post(ADD_MOVIE_API, movieData)
+            .then(() => axios.get(MOVIE_API + title))
+                .then((res) => {
+                    const movieID = res.data[0].id;
 
-        await axios.post(ADD_MOVIE_IMAGES_API, movieImagesFormData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
-        })
-            .then(() => {
-                toastSuccess(`Images added successfully!`)
+                    //Movie genres data
+                    movieGenresFormData.append('fk_id_movie', movieID)
+                    for (let i = 0; i < genres.length; i++) {
+                        movieGenresFormData.append('genres[]', genres[i]);
+                    }
+
+                    //Movie roles data
+                    let roles = selectedRoles.split(',');
+                    movieRolesFormData.append('fk_id_movie', movieID)
+                    for (let i = 0; i < actors.length; i++) {
+                        movieRolesFormData.append('actors[]', actors[i]);
+                    }
+                    for (let i = 0; i < roles.length; i++) {
+                        movieRolesFormData.append('roles[]', roles[i]);
+                    }
+
+                    //Movie images data
+                    movieImagesFormData.append('fk_id_movie', movieID)
+                    movieImagesFormData.append('cover', cover.coverAsFile)
+                    movieImagesFormData.append('background', background.backgroundAsFile)
+                })
+            .then(() => axios.post(ADD_MOVIE_GENRE_API, movieGenresFormData))
+            .then(() => axios.post(ADD_ROLES_API, movieRolesFormData))
+            .then(() => axios.post(ADD_MOVIE_IMAGES_API, movieImagesFormData, {
+                headers: {"Content-Type": "multipart/form-data"}}))
+            .then(async () => {
+                toastSuccess(`You just added "${title}" to your system!`);
+                await wait(3500)
             })
-            .catch(({response})=>{
-                toastError(`Unable to add movie images! Check image parameters.`)
+            .catch(async ({response}) => {
+                toastError(`Unable to remove "${title}" from your system!`)
+                await wait(3500)
             })
     }
 
-    /**
-     * GET request to set next movie ID
-     * @async
-     * @param MOVIE_API
-     * @returns {Promise<void>}
-     */
-    async function getNextMovieID(MOVIE_API) {
-        await fetch(MOVIE_API)
-            .then(res => res.json())
-            .then(data => {
-                console.log("NextMovieID:")
-                console.log(data.length + 1)
-                setNextMovieID(data.length + 1)
-            })
-    }
-
-    /**
-     * GET request to set next movie genre ID
-     * @async
-     * @param MOVIE_GENRE_API
-     * @returns {Promise<void>}
-     */
-    async function getNextMovieGenreID(MOVIE_GENRE_API) {
-        await fetch(MOVIE_GENRE_API)
-            .then(res => res.json())
-            .then(data => {
-                setNextMovieGenreID(data.length + 1)
-            })
-    }
-
-    /**
-     * GET request to set next movie role ID
-     * @async
-     * @param ROLE_API
-     * @returns {Promise<void>}
-     */
-    async function getNextRoleID(ROLE_API) {
-        await fetch(ROLE_API)
-            .then(res => res.json())
-            .then(data => {
-                setNextRoleID(data.length + 1)
-            })
-    }
 
     /**
      * GET request to set genres data
@@ -257,25 +151,6 @@ function AddMovie() {
                     all_genres[i] = data.data[i].id + " - " + data.data[i].name
                 }
                 setAllGenres(all_genres)
-            })
-    }
-
-    /**
-     * GET request to set roles data
-     * @async
-     * @param ROLE_API
-     * @returns {Promise<void>}
-     */
-    async function getRolesData(ROLE_API) {
-        await fetch(ROLE_API)
-            .then(res => res.json())
-            .then(data => {
-                var movie_roles = [], actor_pic = [];
-                for (let i = 0; i < data.length; i++) {
-                        movie_roles.push(data[i].id + " - " + data[i].roleName)
-                        actor_pic.push(data[i].actorPhoto)
-                }
-                setAllActorsPhotos(actor_pic)
             })
     }
 
@@ -358,7 +233,6 @@ function AddMovie() {
                         <h2 className="page-title">Add Movie</h2>
                     </Col>
                 </Row>
-                {/*<Form action="http://localhost:8000/api/movie_images/add_images/" id="image_form" method="POST" encType="multipart/form-data">*/}
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
                             Title:
@@ -456,7 +330,7 @@ function AddMovie() {
                         </Form.Label>
                         <Col sm="7">
                             <Form.Group className="mb-3">
-                                <Form.Control type="file" name="cover" className="form-control" id="cover" onChange={uploadCover}/>
+                                <Form.Control type="file" accept="image/*" name="cover" className="form-control" id="cover" onChange={uploadCover}/>
                             </Form.Group>
                         </Col>
                         <Col sm="2">
@@ -470,7 +344,7 @@ function AddMovie() {
                         </Form.Label>
                         <Col sm="7">
                             <Form.Group className="mb-3">
-                                <Form.Control type="file" name="background" className="form-control" id="background" onChange={uploadBackground}/>
+                                <Form.Control type="file" accept="image/*" name="background" className="form-control" id="background" onChange={uploadBackground}/>
                             </Form.Group>
                         </Col>
                         <Col sm="2">
@@ -483,7 +357,6 @@ function AddMovie() {
                             <i className="far fa-save"></i> Save
                         </Button>{' '}
                     </div>
-                {/*</Form>*/}
             </div>
             <ToastContainer
                 position="top-right"

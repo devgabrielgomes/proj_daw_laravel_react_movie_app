@@ -11,7 +11,6 @@ class Actor extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'name'
     ];
 

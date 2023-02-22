@@ -41,7 +41,6 @@ class MovieimageController extends Controller
     {
         $movie_image = new Movieimage();
 
-        $movie_image->id = $request->id;
         $movie_image->fk_id_movie = $request->fk_id_movie;
         if($request->cover != "" && $request->background != "") {
             $img_cover = $request->file('cover');
@@ -78,14 +77,43 @@ class MovieimageController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateMovieimageRequest  $request
-     * @param  \App\Models\Movieimage  $movieimage
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param $id
+     * @return void
      */
-    public function update(UpdateMovieimageRequest $request, Movieimage $movieimage)
+    public function update(Request $request, $id)
     {
-        //
+        $movie_image_last = Movieimage::where('fk_id_movie', $id)->first();;
+        $cover_path = "uploads/movie_images/cover/";
+        $background_path = "uploads/movie_images/background/";
+
+        $cover_image = $cover_path.$movie_image_last->cover;
+        $background_image = $background_path. $movie_image_last->background;
+
+        if(file_exists($cover_image) && (file_exists($background_image))) {
+            @unlink($cover_image);
+            @unlink($background_image);
+        }
+        $movie_image_last->delete();
+
+        $movie_image = new Movieimage();
+        $movie_image->fk_id_movie = $request->fk_id_movie;
+        if($request->cover != "" && $request->background != "") {
+            $img_cover = $request->file('cover');
+            $img_background = $request->file('background');
+            $extension_cover = $img_cover->getClientOriginalExtension();
+            $extension_background = $img_background->getClientOriginalExtension();
+
+            $filename_cover = "cover_movie_".$request->fk_id_movie.".".$extension_cover;
+            $filename_background = "background_movie_".$request->fk_id_movie.".".$extension_background;
+
+            $img_cover->move($cover_path, $filename_cover);
+            $img_background->move($background_path, $filename_background);
+
+            $movie_image->cover = $filename_cover;
+            $movie_image->background = $filename_background;
+        }
+        $movie_image->save();
     }
 
     /**
@@ -95,18 +123,17 @@ class MovieimageController extends Controller
      */
     public function destroy($id)
     {
-        $movie_image = Movieimage::findOrFail($id);
+        $movie_image = Movieimage::where('fk_id_movie', $id)->first();;
         $cover_path = "uploads/movie_images/cover/";
         $background_path = "uploads/movie_images/background/";
 
         $cover_image = $cover_path.$movie_image->cover;
-        $background_image = $background_path.$movie_image->background;
+        $background_image = $background_path. $movie_image->background;
 
         if(file_exists($cover_image) && (file_exists($background_image))) {
             @unlink($cover_image);
             @unlink($background_image);
         }
-        Movieimage::where('fk_id_movie', '=', $id)->delete();
+        Movieimage::where('fk_id_movie', $id)->delete();
     }
-
 }

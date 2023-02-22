@@ -39,7 +39,6 @@ class ActorimageController extends Controller
     {
         $actor_image = new Actorimage();
 
-        $actor_image->id = $request->id;
         $actor_image->fk_id_actor = $request->fk_id_actor;
         if($request->photo != "") {
             $img = $request->file('photo');

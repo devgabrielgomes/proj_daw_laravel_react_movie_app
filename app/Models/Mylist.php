@@ -12,7 +12,6 @@ class Mylist extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'fk_id_user',
     ];
 

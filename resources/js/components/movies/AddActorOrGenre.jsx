@@ -19,18 +19,13 @@ function AddMovie() {
     const ADD_ACTOR_API = `http://localhost:8000/api/actors/add`
     const ADD_ACTOR_IMAGE_API = `http://localhost:8000/api/actor_image/add`
 
-    const [actorPhoto, setactorPhoto] = useState({});
+    const [actorPhoto, setActorPhoto] = useState({});
     const uploadActorPhoto = (e) => {
-        setactorPhoto({
+        setActorPhoto({
             actorPhotoPreview : URL.createObjectURL(e.target.files[0]),
             actorPhotoAsFile : e.target.files[0]
         })
     }
-
-    useEffect(() => {
-        getNextActorID(ACTOR_API)
-        getNextGenreID(GENRE_API)
-    }, [])
 
     /**
      * POST request to add new actor
@@ -40,7 +35,6 @@ function AddMovie() {
      */
     const postActor = async (e) => {
         const actorFormData = new FormData()
-        actorFormData.append('id', nextActorID)
         actorFormData.append('name', actorName)
 
         await axios.post(ADD_ACTOR_API, actorFormData)
@@ -52,7 +46,6 @@ function AddMovie() {
             })
 
         const actorPhotoFormData = new FormData()
-        actorPhotoFormData.append('id', nextActorID)
         actorPhotoFormData.append('fk_id_actor', nextActorID)
         actorPhotoFormData.append('photo', actorPhoto.actorPhotoAsFile)
 
@@ -80,7 +73,6 @@ function AddMovie() {
      */
     const postGenre = async (e) => {
         const genreFormData = new FormData()
-        genreFormData.append('id', nextGenreID)
         genreFormData.append('name', genreName)
 
         await axios.post(ADD_GENRE_API, genreFormData)
@@ -91,34 +83,6 @@ function AddMovie() {
             })
             .catch(({response})=>{
                 toastError("Unable to add genre! Check genre parameters.")
-            })
-    }
-
-    /**
-     * GET request to set next actor ID
-     * @async
-     * @param ACTOR_API
-     * @returns {Promise<void>}
-     */
-    async function getNextActorID(ACTOR_API) {
-        await fetch(ACTOR_API)
-            .then(res => res.json())
-            .then(data => {
-                setNextActorID(data.data.length + 1)
-            })
-    }
-
-    /**
-     * GET request to set next genre id
-     * @async
-     * @param GENRE_API
-     * @returns {Promise<void>}
-     */
-    async function getNextGenreID(GENRE_API) {
-        await fetch(GENRE_API)
-            .then(res => res.json())
-            .then(data => {
-                setNextGenreID(data.data.length + 1)
             })
     }
 

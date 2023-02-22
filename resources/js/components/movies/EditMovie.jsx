@@ -6,6 +6,7 @@ import {Link, useNavigate, useParams} from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {parseInt} from "lodash";
+import {value} from "lodash/seq";
 
 function EditMovie() {
     const navigate = useNavigate()
@@ -15,28 +16,39 @@ function EditMovie() {
     const MOVIE_GENRE_API = `http://localhost:8000/api/movie_genres/`
     const GENRE_API = `http://localhost:8000/api/genres/`
     const ROLE_API = `http://localhost:8000/api/roles`
-
-
+    const EDIT_MOVIE_API = `http://localhost:8000/api/movies/edit/`
+    const EDIT_MOVIE_GENRES_API = `http://localhost:8000/api/movie_genres/edit/`
+    const EDIT_ROLES_API = `http://localhost:8000/api/roles/edit/`
+    const EDIT_MOVIE_IMAGES_API = `http://localhost:8000/api/movie_images/edit/`
     const [title, setTitle] = useState("");
     const [synopsis, setSynopsis] = useState("");
     const [year, setYear] = useState("");
     const [rating, setRating] = useState("");
-
     const [runtime, setRuntime] = useState("");
     const [trailer, setTrailer] = useState("");
-
-
     const [allGenres, setAllGenres] = useState([]);
     const [allActors, setAllActors] = useState([]);
-    const [rolesText, setText] = useState("");
     const [genres, setSelectedOptionsGenres] = useState([]);
     const [actors, setSelectedOptionsActors] = useState([]);
-    const [roles, setRoles] = useState([]);
+    const [roles, setSelectedOptionsRoles] = useState([]);
+    const [currentCover, setCurrentCover] = useState("");
+    const [currentBackground, setCurrentBackground] = useState("");
 
-    const [cover, setCover] = useState();
-    const [coverImage, setCoverImage] = useState();
-    const [background, setBackground] = useState();
-    const [backgroundImage, setBackgroundImage] = useState();
+    const [cover, setCover] = useState({});
+    const uploadCover = (e) => {
+        setCover({
+            coverPreview : URL.createObjectURL(e.target.files[0]),
+            coverAsFile : e.target.files[0]
+        })
+    }
+
+    const [background, setBackground] = useState({});
+    const uploadBackground = (e) => {
+        setBackground({
+            backgroundPreview : URL.createObjectURL(e.target.files[0]),
+            backgroundAsFile : e.target.files[0]
+        })
+    }
 
     useEffect(() => {
         getMovieData(MOVIE_API)
@@ -45,30 +57,6 @@ function EditMovie() {
         getRolesData(ROLE_API)
         getMovieRolesData(ROLE_API)
     }, [])
-
-    useEffect(() => {
-            if (cover) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setCoverImage(reader.result);
-                };
-                reader.readAsDataURL(cover);
-            } else {
-                setCoverImage(null);
-            }
-        }, [cover]);
-
-    useEffect(() => {
-        if (background) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setBackgroundImage(reader.result);
-            };
-            reader.readAsDataURL(background);
-        } else {
-            setBackgroundImage(null);
-        }
-    }, [background]);
 
     /**
      * GET request to set movie data
@@ -80,14 +68,19 @@ function EditMovie() {
         await fetch(MOVIE_API)
             .then(res => res.json())
             .then(data => {
-                setTitle(data[id - 1].title)
-                setYear(data[id - 1].year)
-                setSynopsis(data[id - 1].synopsis)
-                setRating(data[id - 1].rating)
-                setRuntime(data[id - 1].runtime)
-                setTrailer(data[id - 1].trailer)
-                setCoverImage(data[id - 1].cover)
-                setBackgroundImage(data[id - 1].background)
+                console.log(data)
+                data.forEach(element => {
+                    if(element.id == id) {
+                        setTitle(element.title)
+                        setYear(element.year)
+                        setSynopsis(element.synopsis)
+                        setRating(element.rating)
+                        setRuntime(element.runtime)
+                        setTrailer(element.trailer)
+                        setCurrentCover(element.cover)
+                        setCurrentBackground(element.background)
+                    }
+                });
             })
     }
 
@@ -119,14 +112,12 @@ function EditMovie() {
         await fetch(ROLE_API)
             .then(res => res.json())
             .then(data => {
-                var actors_name = [], movie_roles = [], actor_pic = [];
+                var actors_name = [], movie_roles = [];
                 for (let i = 0; i < data.length; i++) {
                     actors_name.push(data[i].id + " - " + data[i].actorName)
                     movie_roles.push(data[i].id + " - " + data[i].roleName)
-                    actor_pic.push(data[i].actorPhoto)
                 }
                 setAllActors(actors_name)
-                // setAllActorsPhotos(actor_pic)
             })
     }
 
@@ -143,7 +134,7 @@ function EditMovie() {
                 let movie_genres = [];
                 for (let i = 0; i < data.length; i++) {
                     if (data[i].idMovie == id) {
-                        movie_genres.push(data[i].name)
+                        movie_genres.push(data[i].id)
                     }
                 }
                 setSelectedOptionsGenres(movie_genres)
@@ -160,52 +151,71 @@ function EditMovie() {
         await fetch(ROLE_API)
             .then(res => res.json())
             .then(data => {
-                let movie_actors = [], movie_roles = [], actor_pic = [];
+                var movie_actors = [], movie_roles = [];
                 for (let i = 0; i < data.length; i++) {
-                    if (data[i].idMovie === id) {
+                    if (data[i].idMovie == id) {
                         movie_actors.push(data[i].actorName)
                         movie_roles.push(data[i].roleName)
-                        actor_pic.push(data[i].actorPhoto)
                     }
                 }
-
-                console.log("movie_actors:")
-                console.log(movie_actors)
-                console.log("movie_roles:")
-                console.log(movie_roles)
                 setSelectedOptionsActors(movie_actors)
                 setSelectedOptionsRoles(movie_roles)
             })
     }
 
-
-    //
-    // function onCoverChange() {
-    //     var newCover = document.getElementById("new-cover").value;
-    //     console.log("newCover: ", newCover)
-    // }
+    /**
+     * Execute all the put requests needed to edit a movie in the system
+     * @param e
+     * @returns {Promise<void>}
+     */
+    const postForm = async (e) => {
+        e.preventDefault()
+        await editMovie()
+        navigate("/management")
+    }
 
     const editMovie = async (e) => {
-        e.preventDefault()
-        const formData = new FormData()
-        formData.append('title', title)
-        formData.append('year', year)
-        formData.append('synopsis', synopsis)
-        formData.append('rating', rating)
-        formData.append('genres', genres)
-        formData.append('runtime', runtime)
-        formData.append('actors', actors)
-        formData.append('actorsRoles', actorsRoles)
-        formData.append('trailer', trailer)
-
-        await axios.post("/api/edit_movie/", formData)
+        let movieData = {'title': title, 'year': year, 'rating': rating, 'synopsis': synopsis, 'trailer': trailer, 'runtime': runtime}
+        const movieGenresFormData = new FormData()
+        const movieRolesFormData = new FormData()
+        const movieImagesFormData = new FormData()
+        axios.put(EDIT_MOVIE_API + id, movieData)
             .then(() => {
-                toastSuccess(`Movie edited successfully!`)
-                wait(3500)
-                navigate("/management")
+                //Movie genres data
+                movieGenresFormData.append('fk_id_movie', id)
+                for (let i = 0; i < genres.length; i++) {
+                    movieGenresFormData.append('genres[]', genres[i]);
+                }
+
+                //Movie roles data
+                console.log("actors:")
+                console.log(actors)
+                movieRolesFormData.append('fk_id_movie', id)
+                for (let i = 0; i < actors.length; i++) {
+                    movieRolesFormData.append('actors[]', actors[i]);
+                }
+                console.log("roles:")
+                console.log(roles)
+                for (let i = 0; i < roles.length; i++) {
+                    movieRolesFormData.append('roles[]', roles[i]);
+                }
+
+                //Movie images data
+                movieImagesFormData.append('fk_id_movie', id)
+                movieImagesFormData.append('cover', cover.coverAsFile)
+                movieImagesFormData.append('background', background.backgroundAsFile)
             })
-            .catch(({response})=>{
-                toastError(`Unable to edit movie! Check the parameters.`)
+            .then(() => axios.post(EDIT_MOVIE_GENRES_API + id, movieGenresFormData))
+            .then(() => axios.post(EDIT_ROLES_API + id, movieRolesFormData))
+            .then(() => axios.post(EDIT_MOVIE_IMAGES_API + id, movieImagesFormData, {
+                headers: {"Content-Type": "multipart/form-data"}}))
+            .then(async () => {
+                toastSuccess(`Movie "${title}" edit successfully!`);
+                await wait(3500)
+            })
+            .catch(async ({response}) => {
+                toastError(`Unable to edit movie "${title}"!`)
+                await wait(3500)
             })
     }
 
@@ -215,7 +225,6 @@ function EditMovie() {
      */
     const changeHandlerGenres = (e) => {
         let selected_genres = Array.from(e.target.selectedOptions, option => parseInt(option.value));
-        console.log(selected_genres)
         setSelectedOptionsGenres(selected_genres);
     }
 
@@ -233,7 +242,8 @@ function EditMovie() {
      * @param e
      */
     const changeHandlerRoles = (e) => {
-        let selected_roles = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+        let selected_roles = e.target.value.split(',');
+        console.log(selected_roles)
         setSelectedOptionsRoles(selected_roles);
     }
 
@@ -366,10 +376,10 @@ function EditMovie() {
 
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
-                            Current movie actors IDs by order -> <b>{roles.join(', ')}</b>
+                            Current movie roles IDs by actor order -> <b>{roles.join(', ')}</b>
                         </Form.Label>
                         <Col sm="9">
-                            <Form.Control type="text" value={year} onChange={(event)=>{setSelectedOptionsRoles(event.target.value)}}/>
+                            <Form.Control as="textarea" value={roles} onChange={changeHandlerRoles} rows={2}/>
                         </Col>
                     </Form.Group>
 
@@ -388,28 +398,13 @@ function EditMovie() {
                         </Form.Label>
                         <Col sm="7">
                             <Form.Group className="mb-3">
-                                <Form.Label>Choose the movie cover.</Form.Label>
-                                <Form.Control
-                                    type="file"
-                                    id="new-cover"
-                                    accept="image/*"
-                                    onChange={(event) => {
-                                    const file = event.target.files[0];
-                                    if (file && file.type.substring(0,5) === "image") {
-                                        setCover(file);
-                                    } else {
-                                        setCover(null);
-                                    }
-                                }
-                                } />
+                                <Form.Control type="file" accept="image/*" name="cover" className="form-control" id="cover" onChange={uploadCover}/>
                             </Form.Group>
                         </Col>
                         <Col sm="2">
-                            <img className="movie-cover" src={`/uploads/movie_images/cover/${coverImage}`} alt="movie-pos" className="img-thumbnail"></img>
+                            <img name="movie-cover" src={cover.coverPreview ? cover.coverPreview : `/uploads/movie_images/cover/${currentCover}`} alt="movie-pos" className="img-thumbnail"></img>
                         </Col>
                     </Form.Group>
-
-
 
                     <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="3">
@@ -417,32 +412,16 @@ function EditMovie() {
                         </Form.Label>
                         <Col sm="7">
                             <Form.Group className="mb-3">
-                                <Form.Label>Choose the movie background.</Form.Label>
-                                <Form.Control
-                                    type="file"
-                                    id="new-background"
-                                    accept="image/*"
-                                    onChange={(event) => {
-                                        const file = event.target.files[0];
-                                        if (file && file.type.substring(0,5) === "image") {
-                                            setBackground(file);
-                                        } else {
-                                            setBackground(null);
-                                        }
-                                    }
-                                    } />
+                                <Form.Control type="file" accept="image/*" name="background" className="form-control" id="background" onChange={uploadBackground}/>
                             </Form.Group>
                         </Col>
                         <Col sm="2">
-                            <img className="movie-background" src={`/uploads/movie_images/background/${backgroundImage}`} alt="movie-bkg" className="img-thumbnail"></img>
+                            <img name="movie-background" src={background.backgroundPreview ? background.backgroundPreview : `/uploads/movie_images/background/${currentBackground}`}alt="movie-bkg" className="img-thumbnail"></img>
                         </Col>
                     </Form.Group>
 
                     <div className="flex-parent jc-center">
-                        <Button className="delete-button" variant="danger">
-                            <i className="far fa-trash-alt"></i> Delete
-                        </Button>{' '}
-                        <Button className="save-button" variant="primary" onClick={(event)=>createMovie(event)}>
+                        <Button className="save-button" variant="primary" type="submit" onClick={postForm}>
                             <i className="far fa-save"></i> Save
                         </Button>{' '}
                     </div>

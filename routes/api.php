@@ -25,7 +25,9 @@ Route::group(['namespace' => 'App\Http\Controllers\V1'], function() {
     Route::post('movies/add', [App\Http\Controllers\V1\MovieController::class, 'store']);
     Route::get('movies/search/{term}', [App\Http\Controllers\V1\MovieController::class, 'show']);
     Route::delete('movies/remove/{id}', [App\Http\Controllers\V1\MovieController::class, 'destroy']);
-    Route::post('movies/edit/{id}', [App\Http\Controllers\V1\MovieController::class, 'update']);
+    Route::put('movies/edit/{id}', [App\Http\Controllers\V1\MovieController::class, 'update']);
+    Route::get('movies/get_movie_id/{term}', [App\Http\Controllers\V1\MovieController::class, 'getMovieID']);
+    Route::get('movies/raw', [App\Http\Controllers\V1\MovieController::class, 'raw']);
 
     //MOVIE IMAGES REQUESTS
     Route::get('movie_images', [App\Http\Controllers\V1\MovieimageController::class, 'index']);

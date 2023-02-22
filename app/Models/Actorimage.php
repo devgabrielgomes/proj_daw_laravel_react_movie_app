@@ -12,7 +12,6 @@ class Actorimage extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
         'fk_id_movie',
         'cover',
         'background'

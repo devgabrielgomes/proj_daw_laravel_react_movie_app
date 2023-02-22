@@ -20,7 +20,7 @@ class MylistitemController extends Controller
     public function index()
     {
         $results = DB::table('my_list_items')
-            ->join('movie_images', 'my_list_items.fk_id_movie', '=', 'movie_images.id')
+            ->join('movie_images', 'my_list_items.fk_id_movie', '=', 'movie_images.fk_id_movie')
             ->join('movies', 'my_list_items.fk_id_movie', '=', 'movies.id')
             ->select('movies.*', 'movie_images.cover as cover', 'movie_images.background as background')
             ->get();
@@ -49,8 +49,6 @@ class MylistitemController extends Controller
     public function store(Request $request)
     {
         $my_list_item = new Mylistitem();
-
-        $my_list_item->id = $request->id;
         $my_list_item->fk_id_movie = $request->fk_id_movie;
         $my_list_item->fk_id_my_list = $request->fk_id_my_list;
         $my_list_item->save();
