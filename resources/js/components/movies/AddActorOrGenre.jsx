@@ -37,30 +37,29 @@ function AddMovie() {
         const actorFormData = new FormData()
         actorFormData.append('name', actorName)
 
-        await axios.post(ADD_ACTOR_API, actorFormData)
+        axios.post(ADD_ACTOR_API, actorFormData)
             .then(async () => {
                 toastSuccess(`Actor added successfully!`)
             })
-            .catch(({response})=>{
-                toastError("Unable to add actor! Check actor parameters.")
-            })
+            .then(() => axios.get(ACTOR_API))
+                .then((res) => {
+                    const nextActorID = res.data.data[res.data.data.length - 1].id;
+                    const actorPhotoFormData = new FormData()
+                    actorPhotoFormData.append('fk_id_actor', nextActorID)
+                    actorPhotoFormData.append('photo', actorPhoto.actorPhotoAsFile)
 
-        const actorPhotoFormData = new FormData()
-        actorPhotoFormData.append('fk_id_actor', nextActorID)
-        actorPhotoFormData.append('photo', actorPhoto.actorPhotoAsFile)
-
-        await axios.post(ADD_ACTOR_IMAGE_API, actorPhotoFormData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
-        })
-            .then(() => {
-                toastSuccess(`Actor image added successfully!`)
-            })
-            .catch(({response})=>{
-                toastError(`Unable to add actor image! Check image parameters.`)
-            })
-
+                    axios.post(ADD_ACTOR_IMAGE_API, actorPhotoFormData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data"
+                        }
+                    })
+                        .then(() => {
+                            toastSuccess(`Actor image added successfully!`)
+                        })
+                        .catch(({response}) => {
+                            toastError(`Unable to add actor image! Check image parameters.`)
+                        })
+                })
         await wait(3500)
         navigate("/management")
     }

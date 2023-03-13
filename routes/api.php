@@ -18,7 +18,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//Route::post('/add_movie', [MovieController::class, 'add_movie']);
 Route::group(['namespace' => 'App\Http\Controllers\V1'], function() {
     //MOVIE REQUESTS
     Route::get('movies', [App\Http\Controllers\V1\MovieController::class, 'index']);
@@ -63,14 +62,4 @@ Route::group(['namespace' => 'App\Http\Controllers\V1'], function() {
 
     //ACTORS IMAGES REQUESTS
     Route::post('actor_image/add', [App\Http\Controllers\V1\ActorimageController::class, 'store']);
-
-    //Route::apiResource('movies', MovieController::class);
-    //Route::apiResource('actors', ActorController::class);
-   // Route::apiResource('genres', GenreController::class);
-//    //Route::apiResource('movie_genres_old', MoviegenreController::class);
-//    //Route::apiResource('movie_images', MovieimageController::class);
-//    //Route::apiResource('actor_images', ActorimageController::class);
-    //Route::apiResource('my_lists', MylistController::class);
-//    Route::apiResource('my_list_items', MylistitemController::class);
-    //Route::apiResource('roles', RoleController::class);
 });
